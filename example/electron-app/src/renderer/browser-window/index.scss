@@ -9,11 +9,3 @@ body {
     padding-left: 20px;
     padding-right: 20px;
 }
-
-.loading {
-    display: none;
-}
-
-fieldset[disabled] .loading {
-    display: inline-block;
-}

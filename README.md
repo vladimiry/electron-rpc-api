@@ -14,11 +14,11 @@ This module provides services for interacting with `ipcMain` and `webview` provi
 
 - First of all an API structure needs to be defined ([example/electron-app/src/shared/ipc-main-api-definition.ts](example/electron-app/src/shared/ipc-main-api-definition.ts)):
 ```typescript
-import {ApiMethod, IpcMainApiService} from "electron-rpc-api";
+import {ApiMethod, ApiMethodNoArgument, IpcMainApiService} from "electron-rpc-api";
 
 export interface IpcMainApi {
     ping: ApiMethod<{ domain: string, times: number }, { domain: string, value: number }>;
-    quitApp: ApiMethod<undefined, never>;
+    quitApp: ApiMethodNoArgument<never>;
 }
 
 export const IPC_MAIN_API_SERVICE = new IpcMainApiService<IpcMainApi>({channel: "some-ipcMain-channel"});

@@ -1798,11 +1798,11 @@ electron-publish@20.15.0:
     lazy-val "^1.0.3"
     mime "^2.3.1"
 
-electron-rpc-api@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/electron-rpc-api/-/electron-rpc-api-0.1.0.tgz#37c523e5b686ce0ad2a5fcdc62c1e47c0c2703a6"
+electron-rpc-api@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/electron-rpc-api/-/electron-rpc-api-0.2.0.tgz#0e534d6bbad892d525818068bee989d24374dc14"
   dependencies:
-    pubsub-to-stream-api "^0.1.0"
+    pubsub-to-stream-api "^0.2.0"
     tslib "^1.9.2"
 
 electron-to-chromium@^1.2.7:
@@ -4577,9 +4577,9 @@ public-encrypt@^4.0.0:
     parse-asn1 "^5.0.0"
     randombytes "^2.0.1"
 
-pubsub-to-stream-api@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/pubsub-to-stream-api/-/pubsub-to-stream-api-0.1.0.tgz#84b282cf56f2b52453c590044e17d597750fdecd"
+pubsub-to-stream-api@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/pubsub-to-stream-api/-/pubsub-to-stream-api-0.2.0.tgz#6950d57b4547d166b22106bc876bb3a72bd6437e"
   dependencies:
     deserialize-error "^0.0.3"
     rxjs "^6.2.1"

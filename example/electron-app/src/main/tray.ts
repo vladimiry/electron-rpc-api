@@ -18,7 +18,7 @@ export async function init(ctx: AppContext, api: IpcMainApi): Promise<Tray> {
         {
             label: "Quit",
             async click() {
-                await api.quitApp(undefined).toPromise();
+                await api.quitApp().toPromise();
             },
         },
     ]);
