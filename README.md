@@ -1,5 +1,7 @@
 # electron-rpc-api
 
+[![Build Status: Linux / MacOS](https://travis-ci.org/vladimiry/electron-rpc-api.svg?branch=master)](https://travis-ci.org/vladimiry/electron-rpc-api) [![Build status: Windows](https://ci.appveyor.com/api/projects/status/p5ng54wv0mlc3g4x?svg=true)](https://ci.appveyor.com/project/vladimiry/electron-rpc-api)
+
 Is a wrapper around the Electron's IPC for building type-safe API based RPC-like interactions.
 
 You describe an API structure and communication channel only once creating an API Service instance and then you share that instance between provider and client. It means that API method names and types of the input/return parameters on the client side are the same as on the provider side, so you get a type-safety on both sides having no overhead in runtime, thanks to TypeScript.
