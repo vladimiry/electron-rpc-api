@@ -1,0 +1,22 @@
+{
+  // https://www.typescriptlang.org/docs/handbook/tsconfig-json.html
+  // https://www.typescriptlang.org/docs/handbook/compiler-options.html
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "target": "es5",
+    "module": "commonjs",
+    "importHelpers": true,
+    "noEmitOnError": true,
+    "declaration": true,
+    "sourceMap": true,
+    "lib": [
+      "dom",
+      "es6"
+    ],
+    "baseUrl": "./src/lib",
+    "outDir": "./dist"
+  }
+}

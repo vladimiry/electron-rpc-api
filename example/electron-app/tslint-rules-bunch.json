@@ -1,0 +1,40 @@
+{
+  "rulesDirectory": [
+    "./node_modules/tslint-rules-bunch/rules"
+  ],
+  "rules": {
+    "no-import-zones": [
+      true,
+      {
+        "basePath": "src",
+        "verbose": true,
+        "zones": [
+          {
+            "patterns": [
+              {
+                "target": "main/**/*",
+                "from": [
+                  "**/*",
+                  "!main/**/*",
+                  "!shared/**/*"
+                ]
+              }
+            ]
+          },
+          {
+            "patterns": [
+              {
+                "target": "renderer/**/*",
+                "from": [
+                  "**/*",
+                  "!renderer/**/*",
+                  "!shared/**/*"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

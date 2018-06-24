@@ -1,0 +1,50 @@
+import {IpcRenderer} from "electron";
+import {Model, Service} from "pubsub-to-stream-api";
+
+import {AnyType, CombinedEventEmitter} from "./model";
+
+export class WebViewApiService<Api extends Model.ActionsRecord<Extract<keyof Api, string>>> extends Service<Api> {
+
+    public registerApi(actions: Api, {ipcRenderer: instance}: { ipcRenderer?: IpcRenderer } = {}) {
+        const ipcRenderer = instance || require("electron").ipcRenderer;
+        const em: CombinedEventEmitter = {
+            on: (event, listener) => {
+                ipcRenderer.on(event, (...args: AnyType[]) => listener(args[1]));
+                return em;
+            },
+            off: ipcRenderer.removeListener.bind(ipcRenderer),
+            emit: (event, ...args) => {
+                ipcRenderer.sendToHost(event, ...args);
+                return true;
+            },
+        };
+
+        return this.register(actions, em);
+    }
+
+    public buildClient(webView: Electron.WebviewTag, {options}: { options?: Model.CallOptions } = {}) {
+        const listenEvent = "ipc-message";
+        const eventEmitter: CombinedEventEmitter = {
+            on: (event, listener) => {
+                webView.addEventListener(listenEvent, ({channel, args}) => {
+                    if (channel !== event) {
+                        return;
+                    }
+                    listener(args[0]);
+                });
+                return eventEmitter;
+            },
+            off: (
+                // @ts-ignore
+                event,
+                listener,
+            ) => {
+                webView.removeEventListener(listenEvent, listener);
+                return eventEmitter;
+            },
+            emit: webView.send.bind(webView),
+        };
+
+        return this.caller({emitter: eventEmitter, listener: eventEmitter}, options);
+    }
+}

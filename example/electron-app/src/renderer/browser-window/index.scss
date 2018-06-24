@@ -1,0 +1,19 @@
+@import "~bootstrap/scss/bootstrap";
+
+body {
+    margin: 0;
+    padding: 15px;
+}
+
+.btn {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.loading {
+    display: none;
+}
+
+fieldset[disabled] .loading {
+    display: inline-block;
+}
