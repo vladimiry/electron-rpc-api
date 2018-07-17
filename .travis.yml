@@ -13,6 +13,7 @@ cache:
   yarn: true
 install:
   - yarn install
+  - yarn add rxjs@6
 script:
   - node --version
   - npm --version

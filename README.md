@@ -10,6 +10,8 @@ This module provides services for interacting with `ipcMain` and `webview` provi
 
 ## Getting started
 
+Your project needs `rxjs` module to be installed, which is a peer dependency of this project.
+
 `IpcMainApiService` usage example is shown below. It's based on the [example app](example/electron-app), so you can jump there and run the app.
 
 - First of all an API structure needs to be defined ([example/electron-app/src/shared/ipc-main-api-definition.ts](example/electron-app/src/shared/ipc-main-api-definition.ts)):

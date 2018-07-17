@@ -7,6 +7,7 @@
     ],
     "prefer-for-of": true,
     "await-promise": true,
+    "no-floating-promises": true,
     "ordered-imports": false,
     "interface-name": [
       true,

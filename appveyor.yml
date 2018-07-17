@@ -5,6 +5,7 @@ environment:
 install:
   - ps: Install-Product node $env:nodejs_version
   - yarn install
+  - yarn add rxjs@6
 build: off
 test_script:
   - node --version
