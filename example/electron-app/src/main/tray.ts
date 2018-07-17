@@ -1,7 +1,7 @@
 import {app, Menu, Tray} from "electron";
 
 import {AppContext} from "./model";
-import {IpcMainApi} from "@src/shared/ipc-main-api-definition";
+import {IpcMainApi} from "src/shared/ipc-main-api-definition";
 import {toggle as toggleBrowserWindow} from "./window";
 
 export async function init(ctx: AppContext, api: IpcMainApi): Promise<Tray> {

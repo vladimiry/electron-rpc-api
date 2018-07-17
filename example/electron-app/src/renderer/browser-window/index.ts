@@ -1,7 +1,7 @@
 import xss from "xss";
 import "./index.scss";
 
-import {IPC_MAIN_API_SERVICE} from "@src/shared/ipc-main-api-definition";
+import {IPC_MAIN_API_SERVICE} from "src/shared/ipc-main-api-definition";
 
 const ipcMainApiClient = IPC_MAIN_API_SERVICE.buildClient(/*{ipcRenderer: customIpcRenderer, options: {timeoutMs: 1500}}*/);
 const ipcMainPingMethod = ipcMainApiClient("ping"); // type-safe API method resolving

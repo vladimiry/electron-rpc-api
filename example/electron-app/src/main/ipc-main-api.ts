@@ -3,8 +3,8 @@ import {app} from "electron";
 import {map, switchMap, take} from "rxjs/operators";
 import {EMPTY, from, interval} from "rxjs";
 
-import {AnyType} from "@src/shared/model";
-import {IPC_MAIN_API_SERVICE, IpcMainApi} from "@src/shared/ipc-main-api-definition";
+import {AnyType} from "src/shared/model";
+import {IPC_MAIN_API_SERVICE, IpcMainApi} from "src/shared/ipc-main-api-definition";
 
 export function register(): IpcMainApi {
     const api: IpcMainApi = {
