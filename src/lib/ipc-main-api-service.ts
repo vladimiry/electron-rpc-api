@@ -4,7 +4,10 @@ import {Model, Service} from "pubsub-to-stream-api";
 import {AnyType} from "./model";
 
 export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api, string>>> extends Service<Api> {
-    public registerApi(actions: Api, {ipcMain: instance}: { ipcMain?: IpcMain } = {}) {
+    public registerApi(
+        actions: Api,
+        {ipcMain: instance}: { ipcMain?: Pick<IpcMain, "addListener" | "removeListener" | "emit"> } = {},
+    ) {
         const ipcMain = instance || require("electron").ipcMain;
         const em: Model.CombinedEventEmitter = {
             on: ipcMain.addListener.bind(ipcMain),
@@ -16,7 +19,15 @@ export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api
         return this.register(actions, em, {requestResolver});
     }
 
-    public buildClient({ipcRenderer: instance, options}: { ipcRenderer?: IpcRenderer, options?: Model.CallOptions } = {}) {
+    public buildClient(
+        {
+            ipcRenderer: instance,
+            options,
+        }: {
+            ipcRenderer?: Pick<IpcRenderer, "on" | "removeListener" | "send">;
+            options?: Model.CallOptions;
+        } = {},
+    ) {
         const ipcRenderer = instance || require("electron").ipcRenderer;
         const em: Model.CombinedEventEmitter = {
             on: (event, listener) => {

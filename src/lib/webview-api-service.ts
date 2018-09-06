@@ -4,7 +4,10 @@ import {Model, Service} from "pubsub-to-stream-api";
 import {AnyType} from "./model";
 
 export class WebViewApiService<Api extends Model.ActionsRecord<Extract<keyof Api, string>>> extends Service<Api> {
-    public registerApi(actions: Api, {ipcRenderer: instance}: { ipcRenderer?: IpcRenderer } = {}) {
+    public registerApi(
+        actions: Api,
+        {ipcRenderer: instance}: { ipcRenderer?: Pick<IpcRenderer, "on" | "removeListener" | "sendToHost">; } = {},
+    ) {
         const ipcRenderer = instance || require("electron").ipcRenderer;
         const em: Model.CombinedEventEmitter = {
             on: (event, listener) => {
