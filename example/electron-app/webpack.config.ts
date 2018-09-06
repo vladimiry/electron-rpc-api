@@ -8,7 +8,7 @@ import {Options} from "tsconfig-paths-webpack-plugin/lib/options";
 import {TsconfigPathsPlugin} from "tsconfig-paths-webpack-plugin";
 
 import packageJson from "./package.json";
-import {AnyType} from "src/shared/model";
+import {TODO} from "src/shared/model";
 
 const production = process.env.NODE_ENV !== "development";
 const root = (value: string = "") => path.join(process.cwd(), value);
@@ -64,7 +64,7 @@ const configurations = [
                     modulesFromFile: {
                         exclude: ["devDependencies"],
                         include: ["dependencies"],
-                    } as AnyType,
+                    } as TODO,
                 }),
             ],
         },

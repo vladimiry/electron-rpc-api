@@ -2,7 +2,7 @@ import {ApiMethod, ApiMethodNoArgument, IpcMainApiService} from "electron-rpc-ap
 
 export interface IpcMainApi {
     ping: ApiMethod<{ domain: string, times: number }, { domain: string, value: number }>;
-    quitApp: ApiMethodNoArgument<never>;
+    quitApp: ApiMethodNoArgument<null>;
 }
 
 export const IPC_MAIN_API_SERVICE = new IpcMainApiService<IpcMainApi>({channel: "some-ipcMain-channel"});

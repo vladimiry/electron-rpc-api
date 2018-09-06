@@ -1,9 +1,9 @@
 import ping from "ping";
 import {app} from "electron";
 import {map, switchMap, take} from "rxjs/operators";
-import {EMPTY, from, interval} from "rxjs";
+import {from, interval, of} from "rxjs";
 
-import {AnyType} from "src/shared/model";
+import {TODO} from "src/shared/model";
 import {IPC_MAIN_API_SERVICE, IpcMainApi} from "src/shared/ipc-main-api-definition";
 
 export function register(): IpcMainApi {
@@ -11,7 +11,7 @@ export function register(): IpcMainApi {
         ping: ({domain, times}) => interval(1000).pipe(
             take(times),
             switchMap(() => from(ping.promise.probe(domain))),
-            map(({alive, avg}: AnyType) => {
+            map(({alive, avg}: TODO) => {
                 if (!alive) {
                     throw new Error(`Host "${domain}" is unreachable`);
                 }
@@ -20,7 +20,7 @@ export function register(): IpcMainApi {
         ),
         quitApp: () => {
             app.quit();
-            return EMPTY;
+            return of(null);
         },
     };
 
