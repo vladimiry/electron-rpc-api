@@ -6,7 +6,10 @@ import {AnyType} from "./model";
 export class WebViewApiService<Api extends Model.ActionsRecord<Extract<keyof Api, string>>> extends Service<Api> {
     public registerApi(
         actions: Api,
-        {ipcRenderer: instance}: { ipcRenderer?: Pick<IpcRenderer, "on" | "removeListener" | "sendToHost">; } = {},
+        {ipcRenderer: instance, logger}: {
+            ipcRenderer?: Pick<IpcRenderer, "on" | "removeListener" | "sendToHost">;
+            logger?: Model.Logger;
+        } = {},
     ) {
         const ipcRenderer = instance || require("electron").ipcRenderer;
         const em: Model.CombinedEventEmitter = {
@@ -21,7 +24,7 @@ export class WebViewApiService<Api extends Model.ActionsRecord<Extract<keyof Api
             },
         };
 
-        return this.register(actions, em);
+        return this.register(actions, em, {logger});
     }
 
     public buildClient(webView: Electron.WebviewTag, {options}: { options?: Model.CallOptions } = {}) {

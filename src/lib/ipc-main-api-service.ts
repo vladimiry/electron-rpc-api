@@ -6,7 +6,7 @@ import {AnyType} from "./model";
 export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api, string>>> extends Service<Api> {
     public registerApi(
         actions: Api,
-        {ipcMain: instance}: { ipcMain?: Pick<IpcMain, "addListener" | "removeListener" | "emit"> } = {},
+        {ipcMain: instance, logger}: { ipcMain?: Pick<IpcMain, "addListener" | "removeListener" | "emit">; logger?: Model.Logger } = {},
     ) {
         const ipcMain = instance || require("electron").ipcMain;
         const em: Model.CombinedEventEmitter = {
@@ -16,7 +16,7 @@ export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api
         };
         const requestResolver: Model.RequestResolver = ({sender}, payload) => ({payload, emitter: {emit: sender.send.bind(sender)}});
 
-        return this.register(actions, em, {requestResolver});
+        return this.register(actions, em, {requestResolver, logger});
     }
 
     public buildClient(
