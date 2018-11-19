@@ -1,9 +1,13 @@
-import {IpcMain, IpcRenderer} from "electron";
+import {IpcMain, IpcMessageEvent, IpcRenderer} from "electron";
 import {Model, Service} from "pubsub-to-stream-api";
 
 import {AnyType} from "./model";
 
 export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api, string>>> extends Service<Api> {
+    public static resolveActionContext(ctx: IpcMainApiActionContext): IpcMainApiActionContext[typeof Model.ACTION_CONTEXT_SYMBOL] {
+        return ctx[Model.ACTION_CONTEXT_SYMBOL];
+    }
+
     public registerApi(
         actions: Api,
         {ipcMain: instance, logger}: { ipcMain?: Pick<IpcMain, "addListener" | "removeListener" | "emit">; logger?: Model.Logger } = {},
@@ -41,3 +45,5 @@ export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api
         return this.caller({emitter: em, listener: em}, options);
     }
 }
+
+export type IpcMainApiActionContext = Model.ActionContext<[IpcMessageEvent]>;

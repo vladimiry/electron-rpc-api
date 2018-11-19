@@ -62,7 +62,7 @@ test.serial(IpcMainApiService.name, async (t) => {
     t.true(registerStub.notCalled);
     apiService.registerApi(API);
     t.is(1, registerStub.callCount);
-    t.true(registerStub.calledWith(API));
+    t.true((registerStub.calledWith as AnyType)(API));
     t.true(ipcMain.addListener.bind.calledWithExactly(ipcMain));
     t.true(ipcMain.emit.bind.calledWithExactly(ipcMain));
     t.true(ipcMain.removeListener.bind.calledWithExactly(ipcMain));
@@ -101,7 +101,7 @@ test.serial(WebViewApiService.name, async (t) => {
     t.true(registerStub.notCalled);
     apiService.registerApi(API);
     t.is(1, registerStub.callCount);
-    t.true(registerStub.calledWith(API));
+    t.true((registerStub.calledWith as AnyType)(API));
     t.true(ipcRenderer.removeListener.bind.calledWithExactly(ipcRenderer));
 
     // registerApi with custom ipcMain
