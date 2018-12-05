@@ -17,7 +17,7 @@ export class WebViewApiService<Api extends Model.ActionsRecord<Extract<keyof Api
                 ipcRenderer.on(event, (...args: AnyType[]) => listener(args[1]));
                 return em;
             },
-            off: ipcRenderer.removeListener.bind(ipcRenderer),
+            off: ipcRenderer.removeListener.bind(ipcRenderer) as AnyType,
             emit: (event, ...args) => {
                 ipcRenderer.sendToHost(event, ...args);
                 return true;
@@ -47,7 +47,7 @@ export class WebViewApiService<Api extends Model.ActionsRecord<Extract<keyof Api
                 webView.removeEventListener(listenEvent, listener);
                 return eventEmitter;
             },
-            emit: webView.send.bind(webView),
+            emit: webView.send.bind(webView) as AnyType,
         };
 
         return this.caller({emitter: eventEmitter, listener: eventEmitter}, options);

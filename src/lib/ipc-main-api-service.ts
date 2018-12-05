@@ -14,8 +14,8 @@ export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api
     ) {
         const ipcMain = instance || require("electron").ipcMain;
         const em: Model.CombinedEventEmitter = {
-            on: ipcMain.addListener.bind(ipcMain),
-            off: ipcMain.removeListener.bind(ipcMain),
+            on: ipcMain.addListener.bind(ipcMain) as AnyType,
+            off: ipcMain.removeListener.bind(ipcMain) as AnyType,
             emit: ipcMain.emit.bind(ipcMain),
         };
         const requestResolver: Model.RequestResolver = ({sender}, payload) => ({payload, emitter: {emit: sender.send.bind(sender)}});
@@ -38,8 +38,8 @@ export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api
                 ipcRenderer.on(event, (...args: AnyType[]) => listener(args[1]));
                 return em;
             },
-            off: ipcRenderer.removeListener.bind(ipcRenderer),
-            emit: ipcRenderer.send.bind(ipcRenderer),
+            off: ipcRenderer.removeListener.bind(ipcRenderer) as AnyType,
+            emit: ipcRenderer.send.bind(ipcRenderer) as AnyType,
         };
 
         return this.caller({emitter: em, listener: em}, options);
