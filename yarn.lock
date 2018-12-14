@@ -3588,10 +3588,10 @@ public-encrypt@^4.0.0:
     randombytes "^2.0.1"
     safe-buffer "^5.1.2"
 
-pubsub-to-stream-api@^4.0.0-beta.1:
-  version "4.0.0-beta.1"
-  resolved "https://registry.yarnpkg.com/pubsub-to-stream-api/-/pubsub-to-stream-api-4.0.0-beta.1.tgz#ea62c8d1e7408bfc12c9d26959eb97049be419e9"
-  integrity sha512-q9nDfm0FKVl7HqKet/ErUQY/FErO5qv1HhdtsfURkYoTM36H6mClsCi+sTdi+excZ98xDW+TkXN+FmDk4cZo9w==
+pubsub-to-stream-api@^4.0.0-beta.2:
+  version "4.0.0-beta.2"
+  resolved "https://registry.yarnpkg.com/pubsub-to-stream-api/-/pubsub-to-stream-api-4.0.0-beta.2.tgz#e1b186264de4b7b64a7ad1513fbb2b1a3a2351ce"
+  integrity sha512-56tMo+lPQxOkpGHDD/9fhYQPq7Nm2/jIbV/CssFebrmS5kx00qq+e1mUE36GMb9BVM5GxDkDHqSGtgSRPB759g==
   dependencies:
     deserialize-error "^0.0.3"
     jsan "^3.1.13"
