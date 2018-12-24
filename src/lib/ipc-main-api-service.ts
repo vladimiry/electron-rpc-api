@@ -35,7 +35,32 @@ export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api
             registerApiEventEmitters.set(ipcMain, em);
         }
 
-        const requestResolver: Model.RequestResolver = ({sender}, payload) => ({payload, emitter: {emit: sender.send.bind(sender)}});
+        const requestResolver: Model.RequestResolver = ({sender}, payload) => ({
+            payload,
+            emitter: {
+                emit: (...args) => {
+                    if (!sender.isDestroyed()) {
+                        return sender.send.apply(sender, args);
+                    }
+
+                    const {name, type, uid}: Partial<Pick<Model.RequestPayload<string>, "name" | "type" | "uid">>
+                        = typeof payload === "object"
+                        ? payload
+                        : {};
+                    const message = [
+                        `[electron-rpc-api] `,
+                        `Object has been destroyed: "sender". Request payload info: ${JSON.stringify({name, type, uid})}`,
+                    ].join();
+
+                    if (logger) {
+                        logger.error(message);
+                    } else {
+                        // tslint:disable-next-line no-console
+                        (console.error || console.log)(message);
+                    }
+                },
+            },
+        });
 
         return this.register(actions, em, {requestResolver, logger});
     }
