@@ -1,4 +1,4 @@
-import {app, Menu, Tray} from "electron";
+import {Menu, Tray, app} from "electron";
 
 import {AppContext} from "./model";
 import {IpcMainApi} from "src/shared/ipc-main-api-definition";

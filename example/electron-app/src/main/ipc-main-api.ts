@@ -1,10 +1,10 @@
 import ping from "ping";
 import {app} from "electron";
-import {map, switchMap, take} from "rxjs/operators";
 import {from, interval, of} from "rxjs";
+import {map, switchMap, take} from "rxjs/operators";
 
-import {TODO} from "src/shared/model";
 import {IPC_MAIN_API_SERVICE, IpcMainApi} from "src/shared/ipc-main-api-definition";
+import {TODO} from "src/shared/model";
 
 export function register(): IpcMainApi {
     const api: IpcMainApi = {
