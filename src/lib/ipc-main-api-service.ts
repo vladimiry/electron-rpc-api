@@ -53,10 +53,7 @@ export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api
                     ].join();
 
                     if (logger) {
-                        logger.error(message);
-                    } else {
-                        // tslint:disable-next-line no-console
-                        (console.error || console.log)(message);
+                        logger.warn(message);
                     }
                 },
             },
