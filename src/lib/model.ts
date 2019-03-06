@@ -1,4 +1,4 @@
-import {Model, Service} from "pubsub-to-stream-api";
+import {Model} from "pubsub-to-stream-api";
 
 // tslint:disable-next-line:no-any
 export type AnyType = any;
