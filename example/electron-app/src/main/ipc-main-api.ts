@@ -1,30 +1,29 @@
-import ping from "ping";
+import tcpPing from "tcp-ping";
 import {app} from "electron";
-import {from, interval, of} from "rxjs";
-import {map, switchMap, take} from "rxjs/operators";
+import {interval} from "rxjs";
+import {map, mergeMap, take} from "rxjs/operators";
+import {promisify} from "util";
 
-import {IPC_MAIN_API_SERVICE, IpcMainApi} from "src/shared/ipc-main-api-definition";
-import {TODO} from "src/shared/model";
+import {IPC_MAIN_API_SERVICE, ScannedIpcMainApiService} from "src/shared/ipc-main-api-definition";
 
-export function register(): IpcMainApi {
-    const api: IpcMainApi = {
-        ping: ({domain, times}) => interval(1000).pipe(
+export function register(): ScannedIpcMainApiService["ApiClient"] {
+    const api: ScannedIpcMainApiService["ApiImpl"] = {
+        ping: ({domain, times}) => interval(/*one second*/ 1000).pipe(
             take(times),
-            switchMap(() => from(ping.promise.probe(domain))),
-            map(({alive, avg}: TODO) => {
-                if (!alive) {
+            mergeMap(() => promisify(tcpPing.ping)({address: domain, attempts: times})),
+            map(({avg: value}) => {
+                if (typeof value === "undefined" || isNaN(value)) {
                     throw new Error(`Host "${domain}" is unreachable`);
                 }
-                return {domain, value: Number(avg)};
+                return {domain, value};
             }),
         ),
-        quitApp: () => {
+        async quitApp() {
             app.quit();
-            return of(null);
         },
     };
 
-    IPC_MAIN_API_SERVICE.registerApi(api);
+    IPC_MAIN_API_SERVICE.register(api);
 
     return api;
 }

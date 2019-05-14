@@ -1,8 +1,17 @@
-import {ApiMethod, ApiMethodNoArgument, IpcMainApiService} from "electron-rpc-api";
+// no need to put API implementation logic here
+// but only API definition and service instance creating
+// as this file is supposed to be shared between the provider and client implementations
+import {ActionType, ScanService, createIpcMainApiService} from "electron-rpc-api";
 
-export interface IpcMainApi {
-    ping: ApiMethod<{ domain: string, times: number }, { domain: string, value: number }>;
-    quitApp: ApiMethodNoArgument<null>;
-}
+const apiDefinition = {
+    ping: ActionType.Observable<{ domain: string, times: number }, { domain: string, value: number }>(),
+    quitApp: ActionType.Promise(),
+};
 
-export const IPC_MAIN_API_SERVICE = new IpcMainApiService<IpcMainApi>({channel: "some-ipcMain-channel"});
+export const IPC_MAIN_API_SERVICE = createIpcMainApiService({
+    channel: "some-event-name", // event name used to communicate between the event emitters
+    apiDefinition,
+});
+
+// optionally exposing inferred API structure
+export type ScannedIpcMainApiService = ScanService<typeof IPC_MAIN_API_SERVICE>;

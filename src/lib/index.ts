@@ -1,9 +1,11 @@
-import {ApiMethod, ApiMethodNoArgument} from "./model";
+import {ActionType, ScanService} from "pubsub-to-rpc-api";
 
-export * from "./ipc-main-api-service";
-export * from "./webview-api-service";
+import {createIpcMainApiService} from "./ipc-main-api-service";
+import {createWebViewApiService} from "./webview-api-service";
 
 export {
-    ApiMethod,
-    ApiMethodNoArgument,
+    ActionType,
+    createIpcMainApiService,
+    createWebViewApiService,
+    ScanService,
 };

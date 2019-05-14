@@ -1,73 +1,109 @@
-import {IpcRenderer, WebviewTag} from "electron";
-import {Model, Service} from "pubsub-to-stream-api";
+import * as Lib from "pubsub-to-rpc-api";
+import {IpcMessageEvent, IpcRenderer, WebviewTag} from "electron";
 
-import {AnyType} from "./model";
+import * as PM from "./private/model";
+import {requireIpcRenderer} from "./private/electron-require";
 
 type RegisterApiIpcRenderer = Pick<IpcRenderer, "on" | "removeListener" | "sendToHost">;
 
-const registerApiEventEmitters = new WeakMap<RegisterApiIpcRenderer, Model.CombinedEventEmitter>();
-const buildClientEventEmitters = new WeakMap<WebviewTag, Model.CombinedEventEmitter>();
+const ipcRendererEventEmittersCache = new WeakMap<RegisterApiIpcRenderer, Lib.Model.CombinedEventEmitter>();
+const webViewTagEventEmittersCache = new WeakMap<WebviewTag, Lib.Model.CombinedEventEmitter>();
 
-export class WebViewApiService<Api extends Model.ActionsRecord<Extract<keyof Api, string>>> extends Service<Api> {
-    public registerApi(
-        actions: Api,
-        {
-            ipcRenderer = require("electron").ipcRenderer,
-            logger,
-        }: {
+export const createWebViewApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
+    input: Lib.Model.CreateServiceInput<AD>,
+) => {
+    register: (
+        actions: PM.Arguments<Lib.Model.CreateServiceReturn<AD>["register"]>[0],
+        options?: {
             ipcRenderer?: RegisterApiIpcRenderer;
-            logger?: Model.Logger;
-        } = {},
-    ) {
-        let em = registerApiEventEmitters.get(ipcRenderer);
+            logger?: Lib.Model.Logger;
+        },
+    ) => ReturnType<Lib.Model.CreateServiceReturn<AD>["register"]>;
+    client: (
+        webView: WebviewTag,
+        arg?: { options?: Lib.Model.CallOptions },
+    ) => ReturnType<Lib.Model.CreateServiceReturn<AD>["caller"]>;
+} = (...createServiceArgs) => {
+    const baseService: Readonly<ReturnType<typeof Lib.createService>> = Lib.createService(...createServiceArgs);
 
-        if (!em) {
-            const newEm: Model.CombinedEventEmitter = {
-                on: (event, listener) => {
-                    ipcRenderer.on(event, (...args: AnyType[]) => listener(args[1]));
-                    return newEm;
-                },
-                off: ipcRenderer.removeListener.bind(ipcRenderer) as AnyType,
-                emit: (event, ...args) => {
-                    ipcRenderer.sendToHost(event, ...args);
-                    return true;
-                },
+    return {
+        register(actions, options) {
+            const {
+                ipcRenderer = requireIpcRenderer(),
+                logger,
+            } = options || {} as Exclude<typeof options, undefined>;
+            const cachedEm: Lib.Model.CombinedEventEmitter = (
+                ipcRendererEventEmittersCache.get(ipcRenderer)
+                ||
+                (() => {
+                    const em: typeof cachedEm = {
+                        on: ipcRenderer.on.bind(ipcRenderer),
+                        removeListener: ipcRenderer.removeListener.bind(ipcRenderer),
+                        emit: ipcRenderer.sendToHost.bind(ipcRenderer),
+                    };
+
+                    ipcRendererEventEmittersCache.set(ipcRenderer, em);
+
+                    return em;
+                })()
+            );
+            const onEventResolver: Lib.Model.ProviderOnEventResolver = (...[/* event */, payload]) => {
+                return {
+                    payload,
+                    emitter: cachedEm,
+                };
             };
-            registerApiEventEmitters.set(ipcRenderer, newEm);
-            em = newEm;
-        }
 
-        return this.register(actions, em, {logger});
-    }
-
-    public buildClient(webView: WebviewTag, {options}: { options?: Model.CallOptions } = {}) {
-        let em = buildClientEventEmitters.get(webView);
-
-        if (!em) {
-            const listenEvent = "ipc-message";
-            const newEm: Model.CombinedEventEmitter = {
-                on: (event, listener) => {
-                    webView.addEventListener(listenEvent, ({channel, args}) => {
-                        if (channel !== event) {
-                            return;
-                        }
-                        listener(args[0]);
-                    });
-                    return newEm;
+            return baseService.register(
+                actions,
+                cachedEm,
+                {
+                    logger,
+                    onEventResolver,
                 },
-                off: (
-                    // @ts-ignore
-                    event,
-                    listener,
-                ) => {
-                    webView.removeEventListener(listenEvent, listener);
-                    return newEm;
-                },
-                emit: webView.send.bind(webView) as AnyType,
-            };
-            em = newEm;
-        }
+            );
+        },
+        client(webView, arg) {
+            const {options} = arg || {} as Exclude<typeof arg, undefined>;
+            const cachedEm: Lib.Model.CombinedEventEmitter = (
+                webViewTagEventEmittersCache.get(webView)
+                ||
+                (() => {
+                    const clientOnEventResolver: Lib.Model.ClientOnEventResolver<[IpcMessageEvent]> = ({args: [payload]}) => {
+                        // first argument of the IpcMessageEvent.args is th needed payload
+                        return {payload};
+                    };
+                    const ipcMessageEventName = "ipc-message";
+                    const em: typeof cachedEm = {
+                        on: (event, listener) => {
+                            webView.addEventListener(ipcMessageEventName, (ipcMessageEvent) => {
+                                if (ipcMessageEvent.channel !== event) {
+                                    return;
+                                }
 
-        return this.caller({emitter: em, listener: em}, options);
-    }
-}
+                                const {payload} = clientOnEventResolver(ipcMessageEvent);
+
+                                listener(payload);
+                            });
+                            return em;
+                        },
+                        removeListener: (...[/*event*/, listener]) => {
+                            webView.removeEventListener(ipcMessageEventName, listener);
+                            return em;
+                        },
+                        emit: webView.send.bind(webView),
+                    };
+
+                    webViewTagEventEmittersCache.set(webView, em);
+
+                    return em;
+                })()
+            );
+
+            return baseService.caller(
+                {emitter: cachedEm, listener: cachedEm},
+                options,
+            );
+        },
+    };
+};

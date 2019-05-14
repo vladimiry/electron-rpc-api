@@ -1,93 +1,113 @@
+import * as Lib from "pubsub-to-rpc-api";
 import {IpcMain, IpcMessageEvent, IpcRenderer} from "electron";
-import {Model, Service} from "pubsub-to-stream-api";
 
-import {AnyType} from "./model";
+import * as PM from "./private/model";
+import {requireIpcMain, requireIpcRenderer} from "./private/electron-require";
 
-type RegisterApiIpcMain = Pick<IpcMain, "addListener" | "removeListener" | "emit">;
-type BuildClientIpcRenderer = Pick<IpcRenderer, "on" | "removeListener" | "send">;
+// TODO infer from Electron.IpcMain["on"] listener arguments
+type ACA = [IpcMessageEvent, ...PM.Any[]];
 
-const registerApiEventEmitters = new WeakMap<RegisterApiIpcMain, Model.CombinedEventEmitter>();
-const buildClientEventEmitters = new WeakMap<BuildClientIpcRenderer, Model.CombinedEventEmitter>();
+type IpcMainEventEmittersCache = Pick<IpcMain, "on" | "removeListener" | "emit">;
+type IpcRendererEventEmittersCache = Pick<IpcRenderer, "on" | "removeListener" | "send">;
 
-export class IpcMainApiService<Api extends Model.ActionsRecord<Extract<keyof Api, string>>> extends Service<Api> {
-    public static resolveActionContext(ctx: IpcMainApiActionContext): IpcMainApiActionContext[typeof Model.ACTION_CONTEXT_SYMBOL] {
-        return ctx[Model.ACTION_CONTEXT_SYMBOL];
-    }
+const ipcMainEventEmittersCache = new WeakMap<IpcMainEventEmittersCache, Lib.Model.CombinedEventEmitter>();
+const ipcRendererEventEmittersCache = new WeakMap<IpcRendererEventEmittersCache, Lib.Model.CombinedEventEmitter>();
 
-    public registerApi(
-        actions: Api,
-        {
-            ipcMain = require("electron").ipcMain,
-            logger,
-        }: {
-            ipcMain?: RegisterApiIpcMain;
-            logger?: Model.Logger;
-        } = {},
-    ) {
-        let em = registerApiEventEmitters.get(ipcMain);
+export const createIpcMainApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
+    input: Lib.Model.CreateServiceInput<AD>,
+) => {
+    register: (
+        actions: PM.Arguments<Lib.Model.CreateServiceReturn<AD, ACA>["register"]>[0],
+        options?: {
+            ipcMain?: IpcMainEventEmittersCache;
+            logger?: Lib.Model.Logger;
+        },
+    ) => ReturnType<Lib.Model.CreateServiceReturn<AD, ACA>["register"]>;
+    client: (
+        arg?: {
+            ipcRenderer?: IpcRendererEventEmittersCache;
+            options?: Lib.Model.CallOptions;
+        },
+    ) => ReturnType<Lib.Model.CreateServiceReturn<AD, ACA>["caller"]>;
+} = (...createServiceArgs) => {
+    const baseService: Readonly<ReturnType<typeof Lib.createService>>
+        = Lib.createService<(typeof createServiceArgs[0])["apiDefinition"], ACA>(...createServiceArgs);
 
-        if (!em) {
-            em = {
-                on: ipcMain.addListener.bind(ipcMain) as AnyType,
-                off: ipcMain.removeListener.bind(ipcMain) as AnyType,
-                emit: ipcMain.emit.bind(ipcMain),
+    const clientOnEventResolver: Lib.Model.ClientOnEventResolver = (...[/* event */, payload]) => {
+        return {payload};
+    };
+
+    return {
+        register(actions, options) {
+            const {
+                ipcMain = requireIpcMain(),
+                logger,
+            } = options || {} as Exclude<typeof options, undefined>;
+            const cachedEm: Lib.Model.CombinedEventEmitter = (
+                ipcMainEventEmittersCache.get(ipcMain)
+                ||
+                (() => {
+                    const em: typeof cachedEm = {
+                        on: ipcMain.on.bind(ipcMain),
+                        removeListener: ipcMain.removeListener.bind(ipcMain),
+                        emit: ipcMain.emit.bind(ipcMain),
+                    };
+
+                    ipcMainEventEmittersCache.set(ipcMain, em);
+
+                    return em;
+                })()
+            );
+            const onEventResolver: Lib.Model.ProviderOnEventResolver<[IpcMessageEvent, ...PM.Any[]]> = ({sender}, payload) => {
+                return {
+                    payload,
+                    emitter: {
+                        emit: (...args) => {
+                            if (!sender.isDestroyed()) {
+                                return sender.send(...args);
+                            }
+                            if (logger) {
+                                logger.warn(`${PM.MODULE_NAME_PREFIX}: Object has been destroyed: "sender"`);
+                            }
+                        },
+                    },
+                };
             };
-            registerApiEventEmitters.set(ipcMain, em);
-        }
 
-        const requestResolver: Model.RequestResolver = ({sender}, payload) => ({
-            payload,
-            emitter: {
-                emit: (...args) => {
-                    if (!sender.isDestroyed()) {
-                        return sender.send.apply(sender, args);
-                    }
-
-                    const {name, type, uid}: Partial<Pick<Model.RequestPayload<string>, "name" | "type" | "uid">>
-                        = typeof payload === "object"
-                        ? payload
-                        : {};
-                    const message = [
-                        `[electron-rpc-api] `,
-                        `Object has been destroyed: "sender". Request payload info: ${JSON.stringify({name, type, uid})}`,
-                    ].join();
-
-                    if (logger) {
-                        logger.warn(message);
-                    }
+            return baseService.register(
+                actions as PM.Any, // TODO get rid of typecasting
+                cachedEm,
+                {
+                    onEventResolver,
+                    logger,
                 },
-            },
-        });
+            );
+        },
+        client(arg) {
+            const {
+                ipcRenderer = requireIpcRenderer(),
+                options = {timeoutMs: PM.ONE_SECOND_MS * 3},
+            } = arg || {} as Exclude<typeof arg, undefined>;
+            const cachedEm: Lib.Model.CombinedEventEmitter = (
+                ipcRendererEventEmittersCache.get(ipcRenderer)
+                ||
+                (() => {
+                    const em: typeof cachedEm = {
+                        on: ipcRenderer.on.bind(ipcRenderer),
+                        removeListener: ipcRenderer.removeListener.bind(ipcRenderer),
+                        emit: ipcRenderer.send.bind(ipcRenderer),
+                    };
 
-        return this.register(actions, em, {requestResolver, logger});
-    }
+                    ipcRendererEventEmittersCache.set(ipcRenderer, em);
 
-    public buildClient(
-        {
-            ipcRenderer = require("electron").ipcRenderer,
-            options,
-        }: {
-            ipcRenderer?: BuildClientIpcRenderer;
-            options?: Model.CallOptions;
-        } = {},
-    ) {
-        let em: Model.CombinedEventEmitter | undefined = buildClientEventEmitters.get(ipcRenderer);
+                    return em;
+                })()
+            );
 
-        if (!em) {
-            const newEm: Model.CombinedEventEmitter = {
-                on: (event, listener) => {
-                    ipcRenderer.on(event, (...args: AnyType[]) => listener(args[1]));
-                    return newEm;
-                },
-                off: ipcRenderer.removeListener.bind(ipcRenderer) as AnyType,
-                emit: ipcRenderer.send.bind(ipcRenderer) as AnyType,
-            };
-            buildClientEventEmitters.set(ipcRenderer, newEm);
-            em = newEm;
-        }
-
-        return this.caller({emitter: em, listener: em}, options);
-    }
-}
-
-export type IpcMainApiActionContext = Model.ActionContext<[IpcMessageEvent]>;
+            return baseService.caller(
+                {emitter: cachedEm, listener: cachedEm},
+                {onEventResolver: clientOnEventResolver, ...options},
+            );
+        },
+    };
+};

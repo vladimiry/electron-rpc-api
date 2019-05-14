@@ -4,19 +4,25 @@ import url from "url";
 import {app} from "electron";
 
 import {AppContext} from "./model";
-import {IpcMainApi} from "src/shared/ipc-main-api-definition";
+import {ScannedIpcMainApiService} from "src/shared/ipc-main-api-definition";
 import {init as initBrowserWindow} from "./window";
 import {init as initTray} from "./tray";
 import {register as registerApi} from "./ipc-main-api";
 
 const development = process.env.NODE_ENV === "development";
 
-initApp(
-    initContext(),
-    registerApi(),
-);
+// tslint:disable-next-line:no-floating-promises
+(async () => {
+    await initApp(
+        initContext(),
+        registerApi(),
+    );
+})();
 
-async function initApp(ctx: AppContext, api: IpcMainApi) {
+async function initApp(
+    ctx: AppContext,
+    api: ScannedIpcMainApiService["ApiClient"],
+) {
     if (development) {
         app.on("web-contents-created", (webContentsCreatedEvent, contents) => {
             contents.openDevTools();

@@ -1,20 +1,27 @@
 {
-  // https://www.typescriptlang.org/docs/handbook/tsconfig-json.html
-  // https://www.typescriptlang.org/docs/handbook/compiler-options.html
   "extends": "./tsconfig.checks.json",
   "compilerOptions": {
+    /*
+    resolving & capabilities
+    */
     "esModuleInterop": true,
-    "target": "es5",
+    /*
+    emitting
+    */
+    "target": "es6",
     "module": "commonjs",
     "importHelpers": true,
     "noEmitOnError": true,
     "declaration": true,
     "sourceMap": true,
+    /*
+    paths
+    */
     "lib": [
       "dom",
       "es6"
     ],
-    "baseUrl": "./src/lib",
-    "outDir": "./dist"
+    "baseUrl": ".",
+    "outDir": "./lib"
   }
 }

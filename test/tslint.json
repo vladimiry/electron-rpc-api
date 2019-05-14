@@ -13,8 +13,7 @@
               {
                 "target": "test/**/*",
                 "from": [
-                  "src/**/*",
-                  "!src/lib/model"
+                  "src/**/*"
                 ]
               }
             ]

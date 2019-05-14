@@ -1,6 +1,7 @@
 {
   "extends": "./node_modules/tslint/lib/configs/recommended",
   "rules": {
+    "no-unused-variable": true,
     "max-line-length": [
       true,
       140
@@ -8,12 +9,19 @@
     "prefer-for-of": true,
     "await-promise": true,
     "no-floating-promises": true,
-    "ordered-imports": false,
-    "interface-name": [
+    "no-empty-interface": false,
+    "variable-name": [
       true,
-      "never-prefix"
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore"
     ],
     "object-literal-sort-keys": false,
-    "no-any": true
+    "ordered-imports": false,
+    "member-access": false,
+    "interface-name": false,
+    "arrow-parens": [
+      true
+    ]
   }
 }

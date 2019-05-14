@@ -1,6 +1,6 @@
 {
   "name": "electron-rpc-api",
-  "version": "4.0.2",
+  "version": "5.0.0-beta1",
   "description": "Wrapper around the Electron's IPC for building type-safe API based RPC-like and reactive interactions",
   "author": "Vladimir Yakovlev <dev.vladimir.y@gmail.com> (https://github.com/vladimiry)",
   "license": "MIT",
@@ -11,19 +11,19 @@
     "ipc",
     "rpc"
   ],
-  "main": "./dist/index.js",
+  "main": "./lib/index.js",
   "engines": {
-    "node": ">=8.9.4 <9 || >=10.0.0"
+    "node": ">=8.9.4 <9 || >=10.0.0 < 11 || >=11"
   },
   "scripts": {
+    "lib": "npm-run-all lib:clean lint lib:compile test",
+    "lib:clean": "rimraf ./lib",
     "lib:compile": "tsc --listEmittedFiles -p ./src/lib/tsconfig.json",
     "lib:compile:watch": "tsc -w -p ./src/lib/tsconfig.json",
-    "output:clean": "rimraf ./output",
-    "dist:clean": "rimraf ./dist",
-    "dist": "npm-run-all dist:clean lint lib:compile test",
+    "lint": "npm-run-all lint:lib lint:test",
     "lint:lib": "tslint -p ./src/lib/tsconfig.json -c ./tslint.json \"./src/{lib,@types}/**/*.ts\"",
     "lint:test": "tslint -p ./test/tsconfig.json -c ./test/tslint.json \"./test/**/*.ts\"",
-    "lint": "npm-run-all lint:lib lint:test",
+    "output:clean": "rimraf ./output",
     "test": "cross-env TS_NODE_PROJECT=./test/tsconfig.json ava --verbose \"./test/**/*.{spec,test}.ts\""
   },
   "ava": {
@@ -32,28 +32,40 @@
       "ts"
     ],
     "require": [
-      "ts-node/register"
+      "ts-node/register",
+      "tsconfig-paths/register"
     ]
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "peerDependencies": {
-    "rxjs": "^6.3.3"
+    "rxjs": "^6.5.2"
   },
   "dependencies": {
-    "pubsub-to-stream-api": "^4.4.0",
+    "pubsub-to-rpc-api": "^5.0.0-beta4",
     "tslib": "^1.9.2"
   },
   "devDependencies": {
-    "@types/node": "^11.10.4",
+    "@email-securely-app/import-sort-style": "^0.1.0",
+    "@types/node": "^12.0.0",
     "@types/sinon": "^7.0.8",
     "ava": "^1.2.1",
     "cross-env": "^5.2.0",
-    "electron": "^4.0.6",
+    "electron": "^5.0.1",
+    "husky": "^2.2.0",
+    "import-sort-cli": "^6.0.0",
+    "import-sort-parser-typescript": "^6.0.0",
     "install-peers": "^1.0.2",
+    "lint-staged": "^8.1.6",
     "npm-run-all": "^4.1.5",
     "rewiremock": "^3.13.0",
     "rimraf": "^2.6.3",
     "sinon": "^7.2.6",
     "ts-node": "^8.0.2",
+    "tsconfig-paths": "^3.8.0",
     "tslint": "^5.13.1",
     "tslint-rules-bunch": "^0.0.7",
     "typescript": "^3.3.3333"

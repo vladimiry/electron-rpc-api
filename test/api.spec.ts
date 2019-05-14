@@ -1,118 +1,163 @@
 import * as sinon from "sinon";
 import anyTest, {TestInterface} from "ava";
-import rewiremock from "rewiremock";
-import {of} from "rxjs";
 
-import {AnyType} from "../src/lib/model";
-import {ApiMethod, IpcMainApiService, WebViewApiService} from "./../dist";
-
-interface TestContext {
-    mocks: ReturnType<typeof buildMocks>;
-}
+import {ActionType, ScanService} from "lib";
+import {Any, Unpacked} from "lib/private/model";
+import {rewiremock} from "./rewiremock";
 
 const test = anyTest as TestInterface<TestContext>;
-const buildMocks = () => {
-    const emptyFn = () => {
-        // NOOP
-    };
-    const prepareBindStub = () => ({bind: sinon.stub().returns(emptyFn)});
 
-    return {
-        electron: {
-            ipcMain: {
-                addListener: prepareBindStub(),
-                emit: prepareBindStub(),
-                removeListener: prepareBindStub(),
-            },
-            ipcRenderer: {
-                on: prepareBindStub(),
-                removeListener: prepareBindStub(),
-                send: prepareBindStub(),
-            },
-        },
-        webView: {
-            addEventListener: prepareBindStub(),
-            removeEventListener: prepareBindStub(),
-            send: prepareBindStub(),
-        },
-    };
+const apiDefinition = {
+    stringToNumber: ActionType.Promise<[string], number>(),
 };
 
-interface Api {
-    stringToNumber: ApiMethod<string, number>;
-}
-
-const API: Api = {
-    stringToNumber: (input) => of(Number(input)),
-};
-
-test.beforeEach((t) => {
-    t.context.mocks = buildMocks();
-    rewiremock("electron").with(t.context.mocks.electron);
-    rewiremock.enable();
+test.beforeEach(async (t) => {
+    t.context.mocks = await buildMocks();
 });
 
-test.serial(IpcMainApiService.name, async (t) => {
-    const apiService = new IpcMainApiService<Api>({channel: "ch1"});
-    const registerStub = sinon.stub(apiService, "register");
-    const callerStub = sinon.stub(apiService, "caller");
-    const {ipcMain, ipcRenderer} = t.context.mocks.electron;
+test("createIpcMainApiService", async (t) => {
+    const {createIpcMainApiService: createIpcMainApiServiceMocked} = await rewiremock.around(
+        () => import("lib"),
+        (mock) => {
+            mock(() => import("lib/private/electron-require")).with(t.context.mocks["lib/private/electron-require"] as Any);
+            mock(() => import("pubsub-to-rpc-api")).with(t.context.mocks["pubsub-to-rpc-api"]);
+        },
+    );
+    const apiService = createIpcMainApiServiceMocked({
+        channel: "ch1",
+        apiDefinition,
+    });
+    const actions: ScanService<typeof apiService>["ApiImpl"] = {
+        stringToNumber: async (input) => Number(input),
+    };
+    const registerSpy = sinon.spy(apiService, "register");
+    const createServiceSpy = t.context.mocks._mockData["pubsub-to-rpc-api"].createService;
+    const {requireIpcMain: ipcMain, requireIpcRenderer: ipcRenderer} = t.context.mocks._mockData["lib/private/electron-require"];
 
-    // registerApi
-    t.true(registerStub.notCalled);
-    apiService.registerApi(API);
-    t.is(1, registerStub.callCount);
-    t.true((registerStub.calledWith as AnyType)(API));
-    t.true(ipcMain.addListener.bind.calledWithExactly(ipcMain));
+    // register
+    t.true(registerSpy.notCalled);
+    apiService.register(actions);
+    t.is(1, registerSpy.callCount);
+    t.true((registerSpy.calledWith as Any)(actions));
+    t.true(ipcMain.on.bind.calledWithExactly(ipcMain));
     t.true(ipcMain.emit.bind.calledWithExactly(ipcMain));
     t.true(ipcMain.removeListener.bind.calledWithExactly(ipcMain));
 
-    // registerApi with custom ipcMain
-    const {ipcMain: ipcMainOption} = buildMocks().electron;
-    apiService.registerApi(API, {ipcMain: ipcMainOption} as AnyType);
-    t.is(2, registerStub.callCount);
-    t.true(ipcMainOption.addListener.bind.calledWithExactly(ipcMainOption));
+    // register with custom ipcMain
+    const {requireIpcMain: ipcMainOption} = (await buildMocks())._mockData["lib/private/electron-require"];
+    apiService.register(actions, {ipcMain: ipcMainOption} as Any);
+    t.is(2, registerSpy.callCount);
+    t.true(ipcMainOption.on.bind.calledWithExactly(ipcMainOption));
     t.true(ipcMainOption.emit.bind.calledWithExactly(ipcMainOption));
     t.true(ipcMainOption.removeListener.bind.calledWithExactly(ipcMainOption));
 
-    // buildClient
-    t.true(callerStub.notCalled);
-    apiService.buildClient();
-    t.is(1, callerStub.callCount);
+    // should be called after "register" got called
+    const callerSpy = sinon.spy(createServiceSpy.returnValues[0], "caller");
+
+    // client
+    t.true(callerSpy.notCalled);
+    apiService.client();
+    t.is(1, callerSpy.callCount);
     t.true(ipcRenderer.removeListener.bind.calledWithExactly(ipcRenderer));
     t.true(ipcRenderer.send.bind.calledWithExactly(ipcRenderer));
 
-    // buildClient with custom ipcRenderer
-    const {ipcRenderer: ipcRendererOption} = buildMocks().electron;
-    apiService.buildClient({ipcRenderer: ipcRendererOption} as AnyType);
-    t.is(2, callerStub.callCount);
+    // client with custom ipcRenderer
+    const {requireIpcRenderer: ipcRendererOption} = (await buildMocks())._mockData["lib/private/electron-require"];
+    apiService.client({ipcRenderer: ipcRendererOption} as Any);
+    t.is(2, callerSpy.callCount);
     t.true(ipcRendererOption.removeListener.bind.calledWithExactly(ipcRendererOption));
     t.true(ipcRendererOption.send.bind.calledWithExactly(ipcRendererOption));
 });
 
-test.serial(WebViewApiService.name, async (t) => {
-    const apiService = new WebViewApiService<Api>({channel: "ch1"});
-    const registerStub = sinon.stub(apiService, "register");
-    const callerStub = sinon.stub(apiService, "caller");
-    const {ipcRenderer} = t.context.mocks.electron;
-    const webView = t.context.mocks.webView;
+test.serial("createWebViewApiService", async (t) => {
+    const {createWebViewApiService: createWebViewApiServiceMocked} = await rewiremock.around(
+        () => import("lib"),
+        (mock) => {
+            mock(() => import("lib/private/electron-require")).with(t.context.mocks["lib/private/electron-require"] as Any);
+            mock(() => import("pubsub-to-rpc-api")).with(t.context.mocks["pubsub-to-rpc-api"]);
+        },
+    );
+    const apiService = createWebViewApiServiceMocked({
+        channel: "ch1",
+        apiDefinition,
+    });
+    const actions: ScanService<typeof apiService>["ApiImpl"] = {
+        stringToNumber: async (input) => Number(input),
+    };
+    const registerSpy = sinon.spy(apiService, "register");
+    const createServiceSpy = t.context.mocks._mockData["pubsub-to-rpc-api"].createService;
+    const {requireIpcRenderer: ipcRenderer} = t.context.mocks._mockData["lib/private/electron-require"];
+    const {webView} = t.context.mocks._mockData;
 
-    // registerApi
-    t.true(registerStub.notCalled);
-    apiService.registerApi(API);
-    t.is(1, registerStub.callCount);
-    t.true((registerStub.calledWith as AnyType)(API));
+    // register
+    t.true(registerSpy.notCalled);
+    t.true(ipcRenderer.on.bind.notCalled);
+    t.true(ipcRenderer.removeListener.bind.notCalled);
+    t.true(ipcRenderer.sendToHost.bind.notCalled);
+    apiService.register(actions);
+    t.is(1, registerSpy.callCount);
+    t.true((registerSpy.calledWithExactly as Any)(actions));
+    t.true(ipcRenderer.on.bind.calledWithExactly(ipcRenderer));
     t.true(ipcRenderer.removeListener.bind.calledWithExactly(ipcRenderer));
+    t.true(ipcRenderer.sendToHost.bind.calledWithExactly(ipcRenderer));
 
-    // registerApi with custom ipcMain
-    const {ipcRenderer: ipcRendererOption} = buildMocks().electron;
-    apiService.registerApi(API, {ipcRenderer: ipcRendererOption} as AnyType);
-    t.is(2, registerStub.callCount);
+    // register with custom ipcRenderer
+    const {requireIpcRenderer: ipcRendererOption} = (await buildMocks())._mockData["lib/private/electron-require"];
+    apiService.register(actions, {ipcRenderer: ipcRendererOption} as Any);
+    t.is(2, registerSpy.callCount);
     t.true(ipcRendererOption.removeListener.bind.calledWithExactly(ipcRendererOption));
 
-    // buildClient
-    t.true(callerStub.notCalled);
-    apiService.buildClient(webView as AnyType);
-    t.is(1, callerStub.callCount);
+    // should be called after "register" got called
+    const callerSpy = sinon.spy(createServiceSpy.returnValues[0], "caller");
+
+    // client
+    t.true(callerSpy.notCalled);
+    apiService.client(webView as Any);
+    t.is(1, callerSpy.callCount);
     t.true(webView.send.bind.calledWithExactly(webView));
 });
+
+interface TestContext {
+    mocks: Unpacked<ReturnType<typeof buildMocks>>;
+}
+
+function emptyFn() {} // tslint:disable-line:no-empty
+
+async function buildMocks() {
+    const constructBindStub = () => ({bind: sinon.stub().returns(emptyFn)});
+
+    const lib = {...await import("pubsub-to-rpc-api")};
+
+    const _mockData = {
+        "lib/private/electron-require": {
+            requireIpcMain: {
+                on: constructBindStub(),
+                emit: constructBindStub(),
+                removeListener: constructBindStub(),
+            },
+            requireIpcRenderer: {
+                on: constructBindStub(),
+                removeListener: constructBindStub(),
+                send: constructBindStub(),
+                sendToHost: constructBindStub(),
+            },
+        },
+        "pubsub-to-rpc-api": {
+            createService: sinon.spy(lib, "createService"),
+        },
+        "webView": {
+            addEventListener: constructBindStub(),
+            removeEventListener: constructBindStub(),
+            send: constructBindStub(),
+        },
+    };
+
+    return {
+        _mockData,
+        "lib/private/electron-require": {
+            requireIpcMain: () => _mockData["lib/private/electron-require"].requireIpcMain,
+            requireIpcRenderer: () => _mockData["lib/private/electron-require"].requireIpcRenderer,
+        },
+        "pubsub-to-rpc-api": lib,
+    };
+}
