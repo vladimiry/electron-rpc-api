@@ -24,4 +24,4 @@ script:
   - node --version
   - npm --version
   - yarn --version
-  - yarn run dist
+  - yarn run lib
