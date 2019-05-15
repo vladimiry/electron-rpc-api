@@ -1,7 +1,6 @@
 {
   "extends": "./node_modules/tslint/lib/configs/recommended",
   "rules": {
-    "no-unused-variable": true,
     "max-line-length": [
       true,
       140

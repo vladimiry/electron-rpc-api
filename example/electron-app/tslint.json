@@ -5,7 +5,6 @@
     "./tslint-rules-bunch.json"
   ],
   "rules": {
-    "no-unused-variable": false,
     "max-line-length": [
       true,
       140

@@ -45,7 +45,7 @@
     "rxjs": "^6.5.2"
   },
   "dependencies": {
-    "pubsub-to-rpc-api": "^5.0.0-beta4",
+    "pubsub-to-rpc-api": "^5.0.0",
     "tslib": "^1.9.2"
   },
   "devDependencies": {

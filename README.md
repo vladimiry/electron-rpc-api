@@ -1,12 +1,12 @@
 # electron-rpc-api
 
-[![Build Status: Linux / MacOS](https://travis-ci.org/vladimiry/electron-rpc-api.svg?branch=master)](https://travis-ci.org/vladimiry/electron-rpc-api) [![Build status: Windows](https://ci.appveyor.com/api/projects/status/p5ng54wv0mlc3g4x?svg=true)](https://ci.appveyor.com/project/vladimiry/electron-rpc-api)
+[![Build Status](https://travis-ci.org/vladimiry/electron-rpc-api.svg?branch=master)](https://travis-ci.org/vladimiry/electron-rpc-api)
 
 Is a wrapper around the Electron's IPC for building type-safe API based RPC-like and reactive interactions.
 
 You describe an API structure and communication channel only once creating an API Service instance and then you share that instance between provider and client. It means that API method names and types of the input/return parameters on the client side are the same as on the provider side, so you get a type-safety on both sides having no overhead in runtime, thanks to TypeScript.
 
-This module provides services for interacting with `ipcMain` and `webview` providers factory-like functions of which can be imported like this `import {createIpcMainApiService, createWebViewApiService} from "electron-rpc-api"`.
+The module provides `createIpcMainApiService` and `createWebViewApiService` factory-like functions that can be used to create respective service instances.
 
 ## Getting started
 
