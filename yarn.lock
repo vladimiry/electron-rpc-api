@@ -4490,10 +4490,10 @@ public-encrypt@^4.0.0:
     randombytes "^2.0.1"
     safe-buffer "^5.1.2"
 
-pubsub-to-rpc-api@^5.1.0-beta1:
-  version "5.1.0-beta1"
-  resolved "https://registry.yarnpkg.com/pubsub-to-rpc-api/-/pubsub-to-rpc-api-5.1.0-beta1.tgz#bd3c4252556c397361ed16c403d4d0fa7678092b"
-  integrity sha512-v0CfzwdWSW1fmrGLRPvx8+O2hasiOw0Ciedqy070puyGX8Ec6iUGTe6TPsBkFF8BG4wQ3EGpT6iCDJ71NLH3Zw==
+pubsub-to-rpc-api@^5.1.0-beta3:
+  version "5.1.0-beta3"
+  resolved "https://registry.yarnpkg.com/pubsub-to-rpc-api/-/pubsub-to-rpc-api-5.1.0-beta3.tgz#06d70ef5c0d9f96a653c6ddd65ef0b163d10d2c8"
+  integrity sha512-w+fLyTWERgjYHjqFapyzbSLf1DwCfKuDMHFk7V7+eQibbICTLxh+Q8JOE9TeiVdp7BcRtK59jvd4fk6e16lbaw==
   dependencies:
     deserialize-error "^0.0.3"
     jsan "^3.1.13"
