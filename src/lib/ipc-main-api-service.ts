@@ -2,10 +2,11 @@ import * as Lib from "pubsub-to-rpc-api";
 import {IpcMain, IpcMessageEvent, IpcRenderer} from "electron";
 
 import * as PM from "./private/model";
+import {curryOwnFunctionMembers} from "./private/util";
 import {requireIpcMain, requireIpcRenderer} from "./private/electron-require";
 
 // TODO infer from Electron.IpcMain["on"] listener arguments
-type ACA = [IpcMessageEvent, ...PM.Any[]];
+type DefACA = [IpcMessageEvent, ...PM.Any[]];
 
 type IpcMainEventEmittersCache = Pick<IpcMain, "on" | "removeListener" | "emit">;
 type IpcRendererEventEmittersCache = Pick<IpcRenderer, "on" | "removeListener" | "send">;
@@ -13,29 +14,24 @@ type IpcRendererEventEmittersCache = Pick<IpcRenderer, "on" | "removeListener" |
 const ipcMainEventEmittersCache = new WeakMap<IpcMainEventEmittersCache, Lib.Model.CombinedEventEmitter>();
 const ipcRendererEventEmittersCache = new WeakMap<IpcRendererEventEmittersCache, Lib.Model.CombinedEventEmitter>();
 
-export const createIpcMainApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
-    input: Lib.Model.CreateServiceInput<AD>,
-) => {
+export function createIpcMainApiService<AD extends Lib.Model.ApiDefinition<AD>, ACA2 extends DefACA = DefACA>(
+    createServiceArg: Lib.Model.CreateServiceInput<AD>,
+): {
     register: (
-        actions: PM.Arguments<Lib.Model.CreateServiceReturn<AD, ACA>["register"]>[0],
+        actions: PM.Arguments<Lib.Model.CreateServiceReturn<AD, ACA2>["register"]>[0],
         options?: {
             ipcMain?: IpcMainEventEmittersCache;
             logger?: Lib.Model.Logger;
         },
-    ) => ReturnType<Lib.Model.CreateServiceReturn<AD, ACA>["register"]>;
+    ) => ReturnType<Lib.Model.CreateServiceReturn<AD, ACA2>["register"]>;
     client: (
-        arg?: {
+        clientOptions?: {
             ipcRenderer?: IpcRendererEventEmittersCache;
-            options?: Lib.Model.CallOptions;
+            options?: PM.Omit<Partial<Lib.Model.CallOptions<AD, ACA2>>, "onEventResolver">;
         },
-    ) => ReturnType<Lib.Model.CreateServiceReturn<AD, ACA>["caller"]>;
-} = (...createServiceArgs) => {
-    const baseService: Readonly<ReturnType<typeof Lib.createService>>
-        = Lib.createService<(typeof createServiceArgs[0])["apiDefinition"], ACA>(...createServiceArgs);
-
-    const clientOnEventResolver: Lib.Model.ClientOnEventResolver = (...[/* event */, payload]) => {
-        return {payload};
-    };
+    ) => ReturnType<Lib.Model.CreateServiceReturn<AD, ACA2>["caller"]>;
+} {
+    const baseService = Lib.createService<AD, ACA2>(createServiceArg);
 
     return {
         register(actions, options) {
@@ -58,36 +54,44 @@ export const createIpcMainApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
                     return em;
                 })()
             );
-            const onEventResolver: Lib.Model.ProviderOnEventResolver<[IpcMessageEvent, ...PM.Any[]]> = ({sender}, payload) => {
-                return {
-                    payload,
-                    emitter: {
-                        emit: (...args) => {
-                            if (!sender.isDestroyed()) {
-                                return sender.send(...args);
-                            }
-                            if (logger) {
-                                logger.warn(`[${PM.MODULE_NAME}]`, `Object has been destroyed: "sender"`);
-                            }
-                        },
-                    },
-                };
-            };
 
             return baseService.register(
-                actions as PM.Any, // TODO get rid of typecasting
+                actions,
                 cachedEm,
                 {
-                    onEventResolver,
+                    onEventResolver: (...[{sender}, payload]) => {
+                        return {
+                            payload,
+                            emitter: {
+                                emit: (...args) => {
+                                    if (!sender.isDestroyed()) {
+                                        return sender.send(...args);
+                                    }
+                                    if (logger) {
+                                        logger.warn(`[${PM.MODULE_NAME}]`, `Object has been destroyed: "sender"`);
+                                    }
+                                },
+                            },
+                        };
+                    },
                     logger,
                 },
             );
         },
-        client(arg) {
-            const {
+        client(
+            {
                 ipcRenderer = requireIpcRenderer(),
-                options = {timeoutMs: PM.ONE_SECOND_MS * 3},
-            } = arg || {} as Exclude<typeof arg, undefined>;
+                options: {
+                    timeoutMs = PM.BASE_TIMEOUT_MS,
+                    logger: _logger_ = createServiceArg.logger || PM.LOG_STUB, // tslint:disable-line:variable-name
+                    ...callOptions
+                } = {},
+            }: {
+                ipcRenderer?: IpcRendererEventEmittersCache;
+                options?: PM.Omit<Partial<Lib.Model.CallOptions<AD, ACA2>>, "onEventResolver">;
+            } = {},
+        ) {
+            const logger = curryOwnFunctionMembers(_logger_, `[${PM.MODULE_NAME}]`, "createIpcMainApiService() [client]");
             const cachedEm: Lib.Model.CombinedEventEmitter = (
                 ipcRendererEventEmittersCache.get(ipcRenderer)
                 ||
@@ -105,9 +109,19 @@ export const createIpcMainApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
             );
 
             return baseService.caller(
-                {emitter: cachedEm, listener: cachedEm},
-                {onEventResolver: clientOnEventResolver, ...options},
+                {
+                    emitter: cachedEm,
+                    listener: cachedEm,
+                },
+                {
+                    ...callOptions,
+                    timeoutMs,
+                    logger,
+                    onEventResolver: (...[/* event */, payload]) => {
+                        return {payload};
+                    },
+                },
             );
         },
     };
-};
+}

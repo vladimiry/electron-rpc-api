@@ -1,5 +1,9 @@
 {
-  "extends": "./node_modules/tslint/lib/configs/recommended",
+  "extends": [
+    "./node_modules/tslint/lib/configs/recommended",
+    "./tslint-extending/tslint-eslint-rules.json",
+    "./tslint-extending/tslint-consistent-codestyle.json"
+  ],
   "rules": {
     "max-line-length": [
       true,

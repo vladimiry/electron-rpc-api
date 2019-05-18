@@ -6,6 +6,9 @@ import * as PM from "./private/model";
 import {curryOwnFunctionMembers} from "./private/util";
 import {requireIpcRenderer} from "./private/electron-require";
 
+// TODO infer as PM.Arguments<(PM.Arguments<Electron.WebviewTag["on"]>)[1]> (listener is currently defined by Electron as a raw function)
+type ACA2 = [IpcMessageEvent, ...PM.Any[]]; // used by "pubsub-to-rpc-api" like Lib.Model.ActionContext<ACA2>
+
 type RegisterApiIpcRenderer = Pick<IpcRenderer, "on" | "removeListener" | "sendToHost">;
 
 const ipcRendererEventEmittersCache = new WeakMap<RegisterApiIpcRenderer, Lib.Model.CombinedEventEmitter>();
@@ -13,37 +16,33 @@ const webViewTagEventEmittersCache = new WeakMap<WebviewTag, Lib.Model.CombinedE
 
 const clientIpcMessageEventName = "ipc-message";
 const clientIpcMessageListenerBundleProp = Symbol(`[${PM.MODULE_NAME}] clientIpcMessageListenerBundleProp symbol`);
-const clientIpcMessageOnEventResolver: Lib.Model.ClientOnEventResolver<[IpcMessageEvent]> = ({args: [payload]}) => {
-    // first argument of the IpcMessageEvent.args is the needed payload
-    return {payload};
-};
 
-export const createWebViewApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
-    createServiceInput: Lib.Model.CreateServiceInput<AD>,
-) => {
+export function createWebViewApiService<AD extends Lib.Model.ApiDefinition<AD>>(
+    createServiceArg: Lib.Model.CreateServiceInput<AD>,
+): {
     register: (
-        actions: PM.Arguments<Lib.Model.CreateServiceReturn<AD>["register"]>[0],
-        options?: {
-            ipcRenderer?: RegisterApiIpcRenderer;
-            logger?: Lib.Model.Logger;
-        },
-    ) => ReturnType<Lib.Model.CreateServiceReturn<AD>["register"]>;
+        actions: PM.Arguments<Lib.Model.CreateServiceReturn<AD, ACA2>["register"]>[0],
+        options?: Lib.Model.CreateServiceRegisterOptions<AD, ACA2> & { ipcRenderer?: RegisterApiIpcRenderer; },
+    ) => ReturnType<Lib.Model.CreateServiceReturn<AD, ACA2>["register"]>;
     client: (
         webView: WebviewTag,
-        arg?: { options?: Lib.Model.CallOptions },
-    ) => ReturnType<Lib.Model.CreateServiceReturn<AD>["caller"]>;
-} = (createServiceInput) => {
-    const clientLogger = createServiceInput.logger
-        ? curryOwnFunctionMembers(createServiceInput.logger, `[${PM.MODULE_NAME}]`, "createWebViewApiService()", "client()")
-        : PM.LOG_STUB;
-    const baseService: Readonly<ReturnType<typeof Lib.createService>> = Lib.createService(createServiceInput);
+        params?: { options?: Partial<Lib.Model.CallOptions<AD, ACA2>> },
+    ) => ReturnType<Lib.Model.CreateServiceReturn<AD, ACA2>["caller"]>;
+} {
+    const baseService = Lib.createService<AD, ACA2>(createServiceArg);
+    const clientIpcMessageOnEventResolver: Lib.Model.ClientOnEventResolver<AD, ACA2> = (ipcMessageEvent) => {
+        const [payload] = ipcMessageEvent.args;
+        return {payload};
+    };
 
     return {
-        register(actions, options) {
-            const {
-                ipcRenderer = requireIpcRenderer(),
+        register(
+            actions,
+            {
                 logger,
-            } = options || {} as Exclude<typeof options, undefined>;
+                ipcRenderer = requireIpcRenderer(),
+            }: Lib.Model.CreateServiceRegisterOptions<AD, ACA2> & { ipcRenderer?: RegisterApiIpcRenderer; } = {},
+        ) {
             const cachedEm: Lib.Model.CombinedEventEmitter = (
                 ipcRendererEventEmittersCache.get(ipcRenderer)
                 ||
@@ -74,19 +73,30 @@ export const createWebViewApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
                 },
             );
         },
-        client(webView, params) {
-            const {options} = params || {} as Exclude<typeof params, undefined>;
+        client(
+            webView,
+            {
+                options: {
+                    timeoutMs = PM.BASE_TIMEOUT_MS,
+                    logger: _logger_ = createServiceArg.logger || PM.LOG_STUB, // tslint:disable-line:variable-name
+                    ...callOptions
+                } = {},
+            }: {
+                options?: Partial<Lib.Model.CallOptions<AD, ACA2>>;
+            } = {},
+        ) {
+            const logger = curryOwnFunctionMembers(_logger_, `[${PM.MODULE_NAME}]`, "createWebViewApiService() [client]");
             const cachedEm: Lib.Model.CombinedEventEmitter = (
                 webViewTagEventEmittersCache.get(webView)
                 ||
                 (() => {
-                    type IpcMessageListener = (ipcMessageEvent: IpcMessageEvent) => void;
-
                     type IpcMessageListenerBundleProp = Readonly<{
                         uid: ReturnType<typeof uuid.v4>;
                         created: Date;
                         originalEventName: PM.Arguments<Lib.Model.CombinedEventEmitter["on"]>[0];
-                        actual: [typeof clientIpcMessageEventName, IpcMessageListener];
+                        actualListener: [
+                            typeof clientIpcMessageEventName,
+                            (...args: PM.Arguments<typeof clientIpcMessageOnEventResolver>) => void];
                     }>;
 
                     interface IpcMessageListenerBundlePropAware {
@@ -99,7 +109,7 @@ export const createWebViewApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
                                 uid: uuid.v4(),
                                 created: new Date(),
                                 originalEventName,
-                                actual: [
+                                actualListener: [
                                     clientIpcMessageEventName,
                                     (ipcMessageEvent) => {
                                         if (ipcMessageEvent.channel !== originalEventName) {
@@ -110,7 +120,7 @@ export const createWebViewApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
                                 ],
                             };
 
-                            webView.addEventListener(...ipcMessageListenerBundle.actual);
+                            webView.addEventListener(...ipcMessageListenerBundle.actualListener);
 
                             // TODO consider keeping actual listeners in a WeakMap<typeof originalListener, IpcMessageListenerBundleProp>
                             // link actual listener to the original listener, so we then could remove the actual listener
@@ -118,7 +128,14 @@ export const createWebViewApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
                             (originalListener as IpcMessageListenerBundlePropAware)[clientIpcMessageListenerBundleProp]
                                 = ipcMessageListenerBundle;
 
-                            clientLogger.debug(`em: addEventListener(), uid=${ipcMessageListenerBundle.uid}`);
+                            logger.debug(
+                                `[cache] add event listener`,
+                                JSON.stringify({
+                                    originalEventName,
+                                    uid: ipcMessageListenerBundle.uid,
+                                    created: ipcMessageListenerBundle.created,
+                                }),
+                            );
 
                             return em;
                         },
@@ -134,16 +151,20 @@ export const createWebViewApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
                                 return em;
                             }
 
+                            const logData = JSON.stringify({
+                                originalEventName,
+                                uid: ipcMessageListenerBundle.uid,
+                                created: ipcMessageListenerBundle.created,
+                            });
+
                             if (webView.isConnected) {
-                                webView.removeEventListener(...ipcMessageListenerBundle.actual);
+                                webView.removeEventListener(...ipcMessageListenerBundle.actualListener);
+                                logger.warn(`[cache] remove event listener`, logData);
                             } else {
-                                clientLogger.warn(`em: skip "webView.removeEventListener()" since "webView" is not attached to the DOM`);
+                                logger.warn(`[cache] remove event listener: skipped since "webView" is not attached to the DOM`, logData);
                             }
 
                             delete ipcMessageListenerBundlePropAware[clientIpcMessageListenerBundleProp];
-
-                            const {uid, created} = ipcMessageListenerBundle;
-                            clientLogger.debug(`em: removeEventListener(), uid=${uid}, created=${created}`);
 
                             return em;
                         },
@@ -151,7 +172,7 @@ export const createWebViewApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
                             if (webView.isConnected) {
                                 webView.send(...args);
                             } else {
-                                clientLogger.warn(`em: skip "webView.send()" since "webView" is not attached to the DOM`);
+                                logger.warn(`"webView.send()" call skipped since "webView" is not attached to the DOM`);
                             }
                         },
                     };
@@ -164,8 +185,11 @@ export const createWebViewApiService: <AD extends Lib.Model.ApiDefinition<AD>>(
 
             return baseService.caller(
                 {emitter: cachedEm, listener: cachedEm},
-                options,
+                {
+                    ...callOptions,
+                    timeoutMs,
+                },
             );
         },
     };
-};
+}

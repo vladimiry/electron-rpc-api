@@ -12,9 +12,13 @@ export type Unpacked<T> =
         T extends Observable<infer U3> ? U3 :
             T;
 
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 export const MODULE_NAME = "electron-rpc-api";
 
 export const ONE_SECOND_MS = 1000;
+
+export const BASE_TIMEOUT_MS = ONE_SECOND_MS * 3;
 
 export const EMPTY_FN: Lib.Model.LoggerFn = () => {}; // tslint:disable-line:no-empty
 

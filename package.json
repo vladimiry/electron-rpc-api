@@ -1,6 +1,6 @@
 {
   "name": "electron-rpc-api",
-  "version": "5.1.0-beta2",
+  "version": "5.1.0-beta3",
   "description": "Wrapper around the Electron's IPC for building type-safe API based RPC-like and reactive interactions",
   "author": "Vladimir Yakovlev <dev.vladimir.y@gmail.com> (https://github.com/vladimiry)",
   "license": "MIT",
@@ -45,7 +45,7 @@
     "rxjs": "^6.5.2"
   },
   "dependencies": {
-    "pubsub-to-rpc-api": "^5.1.0-beta3",
+    "pubsub-to-rpc-api": "^5.1.0-beta4",
     "tslib": "^1.9.2",
     "uuid-browser": "^3.1.0"
   },
@@ -68,7 +68,9 @@
     "ts-node": "^8.0.2",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.13.1",
+    "tslint-consistent-codestyle": "^1.15.1",
+    "tslint-eslint-rules": "^5.4.0",
     "tslint-rules-bunch": "^0.0.7",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.4.5"
   }
 }

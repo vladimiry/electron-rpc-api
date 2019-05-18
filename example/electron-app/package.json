@@ -26,7 +26,7 @@
     "start:web": "cross-env NODE_ENV=development webpack-dev-server -c ./webpack.config.ts"
   },
   "dependencies": {
-    "electron-rpc-api": "5.0.0",
+    "electron-rpc-api": "5.1.0-beta3",
     "rxjs": "6.5.2",
     "sanitize-html": "1.20.1",
     "tcp-ping": "0.1.1"
