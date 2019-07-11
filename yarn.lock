@@ -4599,15 +4599,15 @@ public-encrypt@^4.0.0:
     randombytes "^2.0.1"
     safe-buffer "^5.1.2"
 
-pubsub-to-rpc-api@^5.1.0-beta4:
-  version "5.1.0-beta4"
-  resolved "https://registry.yarnpkg.com/pubsub-to-rpc-api/-/pubsub-to-rpc-api-5.1.0-beta4.tgz#0b48d2e7342f50f59e9da41ba986e67b6db8dafd"
-  integrity sha512-8U60CdToAivwm/6y6cvJqBoUqUw0IgiGnv5JnlMjg1y6LR3i0ndupo9w8TCD0i8E+A31ll5fqp37xG/Ltt1Png==
+pubsub-to-rpc-api@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/pubsub-to-rpc-api/-/pubsub-to-rpc-api-5.1.0.tgz#7af4b76c49748897475cefe4491b5a6b706754ef"
+  integrity sha512-vCQQfQGDVR2o1VS2YG6IzeFHh4PTuh0JUmZDZu8RDQsvRwpZQRx5UOHlmbxSaMBJYNAzImRZoVbEwM5dYjEeBg==
   dependencies:
     deserialize-error "^0.0.3"
     jsan "^3.1.13"
     serializerr "^1.0.3"
-    tslib "^1.9.3"
+    tslib "^1.10.0"
     uuid-browser "^3.1.0"
 
 pump@^3.0.0:
@@ -5686,7 +5686,7 @@ tslib@1.9.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.0.tgz#e37a86fda8cbbaf23a057f473c9f4dc64e5fc2e8"
   integrity sha512-f/qGG2tUkrISBlQZEjEqoZ3B2+npJjIf04H1wuAv9iA8i04Icp+61KRXxFdha22670NJopsZCIjhC3SnjPRKrQ==
 
-tslib@^1.10.0, tslib@^1.7.1, tslib@^1.8.0, tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
+tslib@^1.10.0, tslib@^1.7.1, tslib@^1.8.0, tslib@^1.8.1, tslib@^1.9.0:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
   integrity sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==
