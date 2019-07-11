@@ -1,6 +1,6 @@
 {
   "name": "electron-rpc-api",
-  "version": "5.1.0-beta3",
+  "version": "5.1.0-beta4",
   "description": "Wrapper around the Electron's IPC for building type-safe API based RPC-like and reactive interactions",
   "author": "Vladimir Yakovlev <dev.vladimir.y@gmail.com> (https://github.com/vladimiry)",
   "license": "MIT",
@@ -36,41 +36,36 @@
       "tsconfig-paths/register"
     ]
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "peerDependencies": {
     "rxjs": "^6.5.2"
   },
   "dependencies": {
     "pubsub-to-rpc-api": "^5.1.0-beta4",
-    "tslib": "^1.9.2",
+    "tslib": "^1.10.0",
     "uuid-browser": "^3.1.0"
   },
   "devDependencies": {
     "@email-securely-app/import-sort-style": "^0.1.0",
-    "@types/node": "^12.0.0",
-    "@types/sinon": "^7.0.8",
+    "@types/node": "^12.6.2",
+    "@types/sinon": "^7.0.13",
     "ava": "^1.2.1",
     "cross-env": "^5.2.0",
-    "electron": "^5.0.1",
-    "husky": "^2.2.0",
+    "electron": "^5.0.6",
+    "husky": "^3.0.0",
     "import-sort-cli": "^6.0.0",
     "import-sort-parser-typescript": "^6.0.0",
     "install-peers": "^1.0.2",
-    "lint-staged": "^8.1.6",
+    "lint-staged": "^9.2.0",
     "npm-run-all": "^4.1.5",
     "rewiremock": "^3.13.0",
     "rimraf": "^2.6.3",
     "sinon": "^7.2.6",
-    "ts-node": "^8.0.2",
+    "ts-node": "^8.3.0",
     "tsconfig-paths": "^3.8.0",
-    "tslint": "^5.13.1",
+    "tslint": "^5.18.0",
     "tslint-consistent-codestyle": "^1.15.1",
     "tslint-eslint-rules": "^5.4.0",
-    "tslint-rules-bunch": "^0.0.7",
-    "typescript": "^3.4.5"
+    "tslint-rules-bunch": "^0.0.8",
+    "typescript": "^3.5.3"
   }
 }
