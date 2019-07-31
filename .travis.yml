@@ -3,7 +3,9 @@ branches:
     - "master"
 language: node_js
 node_js:
-  - "lts/*"
+  - "12"
+  - "10"
+  - "8"
 os:
   - linux
   - osx

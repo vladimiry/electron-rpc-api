@@ -1,12 +1,12 @@
 import * as Lib from "pubsub-to-rpc-api";
-import {IpcMain, IpcMessageEvent, IpcRenderer} from "electron";
+import {IpcMain, IpcMainEvent, IpcRenderer} from "electron";
 
 import * as PM from "./private/model";
 import {curryOwnFunctionMembers} from "./private/util";
 import {requireIpcMain, requireIpcRenderer} from "./private/electron-require";
 
 // TODO infer from Electron.IpcMain["on"] listener arguments
-type DefACA = [IpcMessageEvent, ...PM.Any[]];
+type DefACA = [IpcMainEvent, ...PM.Any[]];
 
 type IpcMainEventEmittersCache = Pick<IpcMain, "on" | "removeListener" | "emit">;
 type IpcRendererEventEmittersCache = Pick<IpcRenderer, "on" | "removeListener" | "send">;
@@ -59,17 +59,12 @@ export function createIpcMainApiService<AD extends Lib.Model.ApiDefinition<AD>, 
                 actions,
                 cachedEm,
                 {
-                    onEventResolver: (...[{sender}, payload]) => {
+                    onEventResolver: (...[event, payload]) => {
                         return {
                             payload,
                             emitter: {
                                 emit: (...args) => {
-                                    if (!sender.isDestroyed()) {
-                                        return sender.send(...args);
-                                    }
-                                    if (logger) {
-                                        logger.warn(`[${PM.MODULE_NAME}]`, `Object has been destroyed: "sender"`);
-                                    }
+                                    event.reply(...args);
                                 },
                             },
                         };
