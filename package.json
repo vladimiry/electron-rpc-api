@@ -1,6 +1,6 @@
 {
   "name": "electron-rpc-api",
-  "version": "6.0.0-beta3",
+  "version": "6.0.0-beta4",
   "description": "Wrapper around the Electron's IPC for building type-safe API based RPC-like and reactive interactions",
   "author": "Vladimir Yakovlev <dev.vladimir.y@gmail.com> (https://github.com/vladimiry)",
   "license": "MIT",
@@ -12,9 +12,6 @@
     "rpc"
   ],
   "main": "./lib/index.js",
-  "engines": {
-    "node": ">=8.9.4 <9 || >=10.0.0 <11 || >=12.0.0"
-  },
   "scripts": {
     "lib": "npm-run-all lib:clean lint lib:compile test",
     "lib:clean": "rimraf ./lib",
