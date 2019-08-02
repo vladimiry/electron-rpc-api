@@ -64,7 +64,13 @@ export function createIpcMainApiService<AD extends Lib.Model.ApiDefinition<AD>, 
                             payload,
                             emitter: {
                                 emit: (...args) => {
-                                    event.reply(...args);
+                                    if (!event.sender.isDestroyed()) {
+                                        event.reply(...args);
+                                        return;
+                                    }
+                                    if (logger) {
+                                        logger.warn(`[${PM.MODULE_NAME}]`, `Object has been destroyed: "sender"`);
+                                    }
                                 },
                             },
                         };
