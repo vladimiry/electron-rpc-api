@@ -69,7 +69,7 @@ export function createIpcMainApiService<AD extends Lib.Model.ApiDefinition<AD>, 
                                         return;
                                     }
                                     if (logger) {
-                                        logger.warn(`[${PM.MODULE_NAME}]`, `Object has been destroyed: "sender"`);
+                                        logger.debug(`[${PM.MODULE_NAME}]`, `Object has been destroyed: "sender"`);
                                     }
                                 },
                             },

@@ -159,9 +159,9 @@ export function createWebViewApiService<AD extends Lib.Model.ApiDefinition<AD>>(
 
                             if (webView.isConnected) {
                                 webView.removeEventListener(...ipcMessageListenerBundle.actualListener);
-                                logger.warn(`[cache] remove event listener`, logData);
+                                logger.debug(`[cache] remove event listener`, logData);
                             } else {
-                                logger.warn(`[cache] remove event listener: skipped since "webView" is not attached to the DOM`, logData);
+                                logger.debug(`[cache] remove event listener: skipped since "webView" is not attached to the DOM`, logData);
                             }
 
                             delete ipcMessageListenerBundlePropAware[clientIpcMessageListenerBundleProp];
@@ -172,7 +172,7 @@ export function createWebViewApiService<AD extends Lib.Model.ApiDefinition<AD>>(
                             if (webView.isConnected) {
                                 webView.send(...args);
                             } else {
-                                logger.warn(`"webView.send()" call skipped since "webView" is not attached to the DOM`);
+                                logger.debug(`"webView.send()" call skipped since "webView" is not attached to the DOM`);
                             }
                         },
                     };
