@@ -170,6 +170,7 @@ export function createWebViewApiService<AD extends Lib.Model.ApiDefinition<AD>>(
                         },
                         emit: (...args) => {
                             if (webView.isConnected) {
+                                // tslint:disable-next-line:no-floating-promises
                                 webView.send(...args);
                             } else {
                                 logger.debug(`"webView.send()" call skipped since "webView" is not attached to the DOM`);
