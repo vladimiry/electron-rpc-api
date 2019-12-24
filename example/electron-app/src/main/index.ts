@@ -24,7 +24,7 @@ async function initApp(
     api: ScannedIpcMainApiService["ApiClient"],
 ) {
     if (development) {
-        app.on("web-contents-created", (webContentsCreatedEvent, contents) => {
+        app.on("web-contents-created", (...[, contents]) => {
             contents.openDevTools();
         });
     }

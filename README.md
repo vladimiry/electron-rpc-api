@@ -23,6 +23,7 @@ Your project needs `rxjs` module to be installed, which is a peer dependency of 
     
     const apiDefinition = {
         ping: ActionType.Observable<{ domain: string, times: number }, { domain: string, value: number }>(),
+        sanitizeHtml: ActionType.Promise<string, string>(),
         quitApp: ActionType.Promise(),
     };
     
@@ -37,6 +38,7 @@ Your project needs `rxjs` module to be installed, which is a peer dependency of 
 
 - API methods implementation and registration in `main` process using previously created `IPC_MAIN_API_SERVICE` service instance ([example/electron-app/src/main/ipc-main-api.ts](example/electron-app/src/main/ipc-main-api.ts)):
     ```typescript
+    import sanitizeHtml from "sanitize-html";
     import tcpPing from "tcp-ping";
     import {app} from "electron";
     import {interval} from "rxjs";
@@ -57,6 +59,17 @@ Your project needs `rxjs` module to be installed, which is a peer dependency of 
                     return {domain, value};
                 }),
             ),
+            async sanitizeHtml(input) {
+                return sanitizeHtml(
+                    input,
+                    {
+                        allowedTags: sanitizeHtml.defaults.allowedTags.concat(["span"]),
+                        allowedClasses: {
+                            span: ["badge", "badge-light", "badge-danger"],
+                        },
+                    },
+                );
+            },
             async quitApp() {
                 app.quit();
             },

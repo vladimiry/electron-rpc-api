@@ -24,8 +24,6 @@ export async function init({locations}: AppContext): Promise<BrowserWindow> {
     await browserWindow.loadURL(locations.browserWindowPage);
     browserWindow.setMenu(null);
 
-    browserWindow.webContents.openDevTools();
-
     return browserWindow;
 }
 
