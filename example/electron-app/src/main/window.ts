@@ -2,9 +2,15 @@ import {BrowserWindow, app} from "electron";
 
 import {AppContext, AppUiContext} from "./model";
 
-export function init({locations}: AppContext): BrowserWindow {
+export async function init({locations}: AppContext): Promise<BrowserWindow> {
     const browserWindow = new BrowserWindow({
         icon: locations.browserWindowIcon,
+        webPreferences: {
+            sandbox: true,
+            nodeIntegration: false,
+            enableRemoteModule: false,
+            preload: locations.browserWindowPreload,
+        },
     });
 
     browserWindow.on("closed", () => {
@@ -15,8 +21,10 @@ export function init({locations}: AppContext): BrowserWindow {
         }
     });
 
-    browserWindow.loadURL(locations.browserWindowPage);
+    await browserWindow.loadURL(locations.browserWindowPage);
     browserWindow.setMenu(null);
+
+    browserWindow.webContents.openDevTools();
 
     return browserWindow;
 }

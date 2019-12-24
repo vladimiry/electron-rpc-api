@@ -7,6 +7,7 @@ export type AppContextLocations = Readonly<{
     readonly app: string;
     readonly browserWindowIcon: string;
     readonly browserWindowPage: string;
+    readonly browserWindowPreload: string;
     readonly trayIcon: string;
     readonly renderer: Readonly<{
         readonly browserWindow: string;

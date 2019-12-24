@@ -1,3 +1,4 @@
+import sanitizeHtml from "sanitize-html";
 import tcpPing from "tcp-ping";
 import {app} from "electron";
 import {interval} from "rxjs";
@@ -18,6 +19,17 @@ export function register(): ScannedIpcMainApiService["ApiClient"] {
                 return {domain, value};
             }),
         ),
+        async sanitizeHtml(input) {
+            return sanitizeHtml(
+                input,
+                {
+                    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["span"]),
+                    allowedClasses: {
+                        span: ["badge", "badge-light", "badge-danger"],
+                    },
+                },
+            );
+        },
         async quitApp() {
             app.quit();
         },

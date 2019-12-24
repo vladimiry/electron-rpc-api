@@ -31,13 +31,13 @@ async function initApp(
 
     app.on("ready", async () => {
         const uiContext = ctx.uiContext = {
-            browserWindow: initBrowserWindow(ctx),
+            browserWindow: await initBrowserWindow(ctx),
             tray: await initTray(ctx, api),
         };
 
-        app.on("activate", () => {
+        app.on("activate", async () => {
             if (!uiContext.browserWindow || uiContext.browserWindow.isDestroyed()) {
-                uiContext.browserWindow = initBrowserWindow(ctx);
+                uiContext.browserWindow = await initBrowserWindow(ctx);
             }
         });
     });
@@ -51,13 +51,24 @@ function initContext(): AppContext {
     const browserWindowPage = development
         ? "http://localhost:8080/renderer/browser-window/index.html"
         : formatFileUrl(appRelative("./generated/renderer/browser-window/index.html"));
-    const trayIcon = appRelative(os.platform() === "darwin" ? "./assets/icons/mac/icon.png" : browserWindowIcon);
+    const trayIcon = appRelative(
+        os.platform() === "darwin"
+            ? "./assets/icons/mac/icon.png"
+            : (
+                os.platform() !== "win32"
+                    // 32x32 on non-macOS/non-Windows systems (eg Linux)
+                    // https://github.com/electron/electron/issues/21445#issuecomment-565710027
+                    ? "./assets/icons/icon-32x32.png"
+                    : browserWindowIcon
+            ),
+    );
 
     return {
         locations: {
             app: appRelative(),
             browserWindowIcon: appRelative(browserWindowIcon),
             browserWindowPage,
+            browserWindowPreload: appRelative("./generated/renderer/browser-window-preload/index.js"),
             trayIcon,
             renderer: {
                 browserWindow: appRelative("./generated/renderer/browser-window/index.js"),

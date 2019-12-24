@@ -8,7 +8,6 @@ import {Options} from "tsconfig-paths-webpack-plugin/lib/options";
 import {TsconfigPathsPlugin} from "tsconfig-paths-webpack-plugin";
 
 import packageJson from "./package.json";
-import {TODO} from "src/shared/model";
 
 const production = process.env.NODE_ENV !== "development";
 const root = (value: string = "") => path.join(process.cwd(), value);
@@ -19,7 +18,7 @@ const buildConfig = (configPatch: Configuration, tsOptions: Partial<Options> = {
         configPatch,
         {
             mode: production ? "production" : "development",
-            devtool: production ? false : "source-map",
+            devtool: false,
             output: {
                 filename: "[name].js",
                 path: output(),
@@ -29,9 +28,9 @@ const buildConfig = (configPatch: Configuration, tsOptions: Partial<Options> = {
                     {
                         test: /\.ts$/,
                         use: {
-                            loader: "awesome-typescript-loader",
+                            loader: "ts-loader",
                             options: {
-                                configFileName: tsOptions.configFile,
+                                configFile: tsOptions.configFile,
                             },
                         },
                     },
@@ -47,6 +46,11 @@ const buildConfig = (configPatch: Configuration, tsOptions: Partial<Options> = {
                 __dirname: false,
                 __filename: false,
             },
+            optimization: {
+                minimize: false,
+                namedChunks: true,
+                namedModules: true,
+            },
         },
     );
 };
@@ -56,7 +60,6 @@ const configurations = [
         {
             target: "electron-main",
             entry: {
-                // tslint:disable-next-line:object-literal-key-quotes
                 "main/index": root("./src/main/index.ts"),
             },
             externals: [
@@ -64,7 +67,7 @@ const configurations = [
                     modulesFromFile: {
                         exclude: ["devDependencies"],
                         include: ["dependencies"],
-                    } as TODO,
+                    },
                 }),
             ],
         },
@@ -74,6 +77,20 @@ const configurations = [
     ),
     buildConfig(
         {
+            entry: {
+                "renderer/browser-window-preload/index": root("./src/renderer/browser-window-preload/index.ts"),
+            },
+            target: "electron-renderer",
+        },
+        {
+            configFile: root("./src/renderer/browser-window-preload/tsconfig.json"),
+        },
+    ),
+    buildConfig(
+        {
+            entry: {
+                "renderer/browser-window/index": root("./src/renderer/browser-window/index.ts"),
+            },
             ...(production ? {} : {
                 devServer: {
                     inline: true,
@@ -81,9 +98,16 @@ const configurations = [
                     clientLogLevel: "error",
                 },
             }),
-            target: "electron-renderer",
-            entry: {
-                "renderer/browser-window/index": root("./src/renderer/browser-window/index.ts"),
+            target: "web",
+            node: {
+                path: "empty",
+                fs: "empty",
+                __dirname: false,
+                __filename: false,
+                Buffer: false,
+                global: false,
+                process: false,
+                setImmediate: false,
             },
             module: {
                 rules: [
@@ -116,7 +140,7 @@ const configurations = [
             ],
         },
         {
-            configFile: root("./src/renderer/tsconfig.json"),
+            configFile: root("./src/renderer/browser-window/tsconfig.json"),
         },
     ),
 ];
