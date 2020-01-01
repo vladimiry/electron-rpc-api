@@ -1,5 +1,5 @@
 import * as Lib from "pubsub-to-rpc-api";
-import uuid from "uuid-browser";
+import UUID from "pure-uuid";
 import {IpcMessageEvent, IpcRenderer, WebviewTag} from "electron";
 
 import * as PM from "./private/model";
@@ -91,7 +91,7 @@ export function createWebViewApiService<AD extends Lib.Model.ApiDefinition<AD>>(
                 ||
                 (() => {
                     type IpcMessageListenerBundleProp = Readonly<{
-                        uid: ReturnType<typeof uuid.v4>;
+                        uid: string;
                         created: Date;
                         originalEventName: PM.Arguments<Lib.Model.CombinedEventEmitter["on"]>[0];
                         actualListener: [
@@ -106,7 +106,7 @@ export function createWebViewApiService<AD extends Lib.Model.ApiDefinition<AD>>(
                     const em: typeof cachedEm = {
                         on: (originalEventName, originalListener) => {
                             const ipcMessageListenerBundle: IpcMessageListenerBundleProp = {
-                                uid: uuid.v4(),
+                                uid: new UUID(4).format(),
                                 created: new Date(),
                                 originalEventName,
                                 actualListener: [
