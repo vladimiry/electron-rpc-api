@@ -1,7 +1,6 @@
 {
   "*.ts": [
     "npx import-sort --write",
-    "npx tslint -p ./tsconfig.json --fix",
-    "git add"
+    "npx tslint -p ./tsconfig.json --fix"
   ]
 }
