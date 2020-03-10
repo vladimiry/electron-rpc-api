@@ -1,6 +1,6 @@
 {
   "name": "electron-rpc-api",
-  "version": "6.1.0-beta.2",
+  "version": "6.1.0-beta.3",
   "description": "Wrapper around the Electron's IPC for building type-safe API based RPC-like and reactive interactions",
   "author": "Vladimir Yakovlev <dev.vladimir.y@gmail.com> (https://github.com/vladimiry)",
   "license": "MIT",
@@ -24,14 +24,18 @@
     "test": "cross-env TS_NODE_PROJECT=./test/tsconfig.json ava --verbose \"./test/**/*.{spec,test}.ts\""
   },
   "ava": {
-    "compileEnhancements": false,
     "extensions": [
+      "js",
       "ts"
+    ],
+    "files": [
+      "./test/**/*.{spec,test}.{ts,js}"
     ],
     "require": [
       "ts-node/register",
       "tsconfig-paths/register"
-    ]
+    ],
+    "verbose": true
   },
   "peerDependencies": {
     "electron": ">=5.0.0",
@@ -40,19 +44,19 @@
   "dependencies": {
     "pubsub-to-rpc-api": "^5.2.0-beta.2",
     "pure-uuid": "^1.5.8",
-    "tslib": "^1.11.0"
+    "tslib": "^1.11.1"
   },
   "devDependencies": {
     "@email-securely-app/import-sort-style": "^0.1.0",
     "@types/node": "^12.12.21",
-    "@types/sinon": "^7.5.1",
-    "ava": "^1.2.1",
-    "cross-env": "^7.0.0",
+    "@types/sinon": "^7.5.2",
+    "ava": "^3.5.0",
+    "cross-env": "^7.0.2",
     "husky": "^4.2.3",
     "import-sort-cli": "^6.0.0",
     "import-sort-parser-typescript": "^6.0.0",
     "install-peers": "^1.0.2",
-    "lint-staged": "^10.0.7",
+    "lint-staged": "^10.0.8",
     "npm-run-all": "^4.1.5",
     "rewiremock": "^3.13.9",
     "rimraf": "^3.0.2",
@@ -63,6 +67,6 @@
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-rules-bunch": "^0.0.8",
-    "typescript": "^3.8.2"
+    "typescript": "^3.8.3"
   }
 }
