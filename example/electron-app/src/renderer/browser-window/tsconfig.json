@@ -1,6 +1,7 @@
 {
   "extends": "../../../tsconfig.json",
   "files": [
+    "./electron-exposure.d.ts",
     "./index.ts"
   ]
 }

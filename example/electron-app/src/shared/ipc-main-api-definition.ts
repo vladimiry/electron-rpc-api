@@ -4,7 +4,7 @@
 import {ActionType, ScanService, createIpcMainApiService} from "electron-rpc-api";
 
 const apiDefinition = {
-    ping: ActionType.Observable<{ domain: string, times: number }, { domain: string, value: number }>(),
+    ping: ActionType.SubscribableLike<{ domain: string, times: number }, { domain: string, value: number }>(),
     sanitizeHtml: ActionType.Promise<string, string>(),
     quitApp: ActionType.Promise(),
 };

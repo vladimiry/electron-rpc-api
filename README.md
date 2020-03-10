@@ -12,6 +12,10 @@ The module provides `createIpcMainApiService` and `createWebViewApiService` fact
 
 Your project needs `rxjs` module to be installed, which is a peer dependency of this project.
 
+Method resolving and method calling are type-safe actions here:
+
+![type-safety](img/README-img1.gif)
+
 `IpcMainApiService` usage example is shown below. It's based on the [example app](example/electron-app), so you can jump there and run the app.
 
 - First of all an API structure needs to be defined ([example/electron-app/src/shared/ipc-main-api-definition.ts](example/electron-app/src/shared/ipc-main-api-definition.ts)):
@@ -22,7 +26,7 @@ Your project needs `rxjs` module to be installed, which is a peer dependency of 
     import {ActionType, ScanService, createIpcMainApiService} from "electron-rpc-api";
     
     const apiDefinition = {
-        ping: ActionType.Observable<{ domain: string, times: number }, { domain: string, value: number }>(),
+        ping: ActionType.SubscribableLike<{ domain: string, times: number }, { domain: string, value: number }>(),
         sanitizeHtml: ActionType.Promise<string, string>(),
         quitApp: ActionType.Promise(),
     };
@@ -43,22 +47,27 @@ Your project needs `rxjs` module to be installed, which is a peer dependency of 
     import {app} from "electron";
     import {interval} from "rxjs";
     import {map, mergeMap, take} from "rxjs/operators";
+    import {observableToSubscribableLike} from "electron-rpc-api";
     import {promisify} from "util";
     
     import {IPC_MAIN_API_SERVICE, ScannedIpcMainApiService} from "src/shared/ipc-main-api-definition";
     
     export function register(): ScannedIpcMainApiService["ApiClient"] {
         const api: ScannedIpcMainApiService["ApiImpl"] = {
-            ping: ({domain, times}) => interval(/*one second*/ 1000).pipe(
-                take(times),
-                mergeMap(() => promisify(tcpPing.ping)({address: domain, attempts: times})),
-                map(({avg: value}) => {
-                    if (typeof value === "undefined" || isNaN(value)) {
-                        throw new Error(`Host "${domain}" is unreachable`);
-                    }
-                    return {domain, value};
-                }),
-            ),
+            ping: ({domain, times}) => {
+                return observableToSubscribableLike(
+                    interval(/*one second*/ 1000).pipe(
+                        take(times),
+                        mergeMap(() => promisify(tcpPing.ping)({address: domain, attempts: times})),
+                        map(({avg: value}) => {
+                            if (typeof value === "undefined" || isNaN(value)) {
+                                throw new Error(`Host "${domain}" is unreachable`);
+                            }
+                            return {domain, value};
+                        }),
+                    )
+                );
+            },
             async sanitizeHtml(input) {
                 return sanitizeHtml(
                     input,
@@ -81,52 +90,87 @@ Your project needs `rxjs` module to be installed, which is a peer dependency of 
     }
     ```
 
-- And finally calling the API methods in `renderer` process using the same service instance ([example/electron-app/src/renderer/browser-window-preload/index.ts](example/electron-app/src/renderer/browser-window-preload/index.ts)):
+- Exposing the API Client factory function to `renderer` process as `window.__ELECTRON_EXPOSURE__` property using `contextBridge.exposeInMainWorld` call in `preload` script ([example/electron-app/src/renderer/browser-window-preload/index.ts](example/electron-app/src/renderer/browser-window-preload/index.ts)):
     ```typescript
-    import {Subscription} from "rxjs";
+    import {contextBridge} from "electron";
     
+    import {ElectronWindow} from "src/shared/model";
     import {IPC_MAIN_API_SERVICE} from "src/shared/ipc-main-api-definition";
     
-    const subscription = new Subscription();
+    export const __ELECTRON_EXPOSURE__: ElectronWindow["__ELECTRON_EXPOSURE__"] = {
+        buildIpcMainClient: IPC_MAIN_API_SERVICE.client.bind(IPC_MAIN_API_SERVICE),
+    };
+    
+    contextBridge.exposeInMainWorld("__ELECTRON_EXPOSURE__", __ELECTRON_EXPOSURE__);    
+    ```
+
+- And finally calling the API methods in `renderer` process using exposed in preload script `window.__ELECTRON_EXPOSURE__` property ([example/electron-app/src/renderer/browser-window/index.ts](example/electron-app/src/renderer/browser-window/index.ts)):
+    ```typescript
+    import {subscribableLikeToObservable} from "electron-rpc-api";
+    
+    import "./index.scss";
+    
+    // this "cleanup" code is recommended if you created/destroy
+    // the renderer processes dynamically multiple times
     const cleanupPromise = new Promise<void>((resolve) => {
         // WARN: don"t call ".destroy()" on BrowserWindow in main process but ".close()"
         // since app needs "window.onbeforeunload" to be triggered
-        window.onbeforeunload = () => {
-            resolve();
-            subscription.unsubscribe();
-        };
+        window.onbeforeunload = () => resolve();
     });
     
-    const ipcMainApiClient = IPC_MAIN_API_SERVICE.client({
-        options: {finishPromise: cleanupPromise, timeoutMs: 1000 * 3 /* 3 seconds */},
+    const ipcMainApiClient = __ELECTRON_EXPOSURE__.buildIpcMainClient({
+        // this "cleanup" code is recommended if you created/destroy
+        // the renderer processes dynamically multiple times
+        options: {finishPromise: cleanupPromise},
     });
+    
+    // resolved methods
     const ipcMainPingMethod = ipcMainApiClient("ping"); // type-safe API method resolving
-    const sanitizeHtmlMethod = ipcMainApiClient("sanitizeHtml"); // type-safe API method resolving
+    const ipcMainSanitizeHtmlMethod = ipcMainApiClient("sanitizeHtml"); // type-safe API method resolving
     
     window.addEventListener("DOMContentLoaded", () => {
-        const input = document.querySelector("[name=domain]") as HTMLInputElement;
-        const times = document.querySelector("[name=times]") as HTMLInputElement;
         const form = document.querySelector("form") as HTMLFormElement;
+        const fieldset = form.querySelector("fieldset") as HTMLFieldSetElement;
+        const input = form.querySelector("[name=domain]") as HTMLInputElement;
+        const times = form.querySelector("[name=times]") as HTMLInputElement;
+        const quitBtn = form.querySelector(`[type="button"]`) as HTMLFormElement;
+        const disableForm = (disable: boolean) => {
+            disable
+                ? fieldset.setAttribute("disabled", "disabled")
+                : fieldset.removeAttribute("disabled")
+        };
     
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
+            disableForm(true);
     
-            subscription.add(
-                ipcMainPingMethod({domain: input.value, times: Number(times.value)}).subscribe( // type-safe API method calling
-                    async ({domain, value}) => await append(`<span class="badge badge-light">${domain}</span> <small>${value}</small>`),
-                    async ({message}) => await append(`<span class="badge badge-danger">${message}</span>`), // error handling
-                ),
+            // type-safe API method calling
+            subscribableLikeToObservable(
+                ipcMainPingMethod({domain: input.value, times: Number(times.value)})
+            ).subscribe(
+                async ({domain, value}) => {
+                    await append(`<span class="badge badge-light">${domain}</span> <small>${value}</small>`);
+                },
+                // "error" handler
+                async ({message}) => {
+                    disableForm(false);
+                    await append(`<span class="badge badge-danger">${message}</span>`);
+                },
+                // "complete" handler
+                () => {
+                    disableForm(false);
+                },
             );
+        });
+    
+        quitBtn.addEventListener("click", async () => {
+            await ipcMainApiClient("quitApp")();
         });
     });
     
     async function append(html: string) {
         document.body
             .appendChild(document.createElement("div"))
-            .innerHTML = await sanitizeHtmlMethod(html);
+            .innerHTML = await ipcMainSanitizeHtmlMethod(html);
     }
     ```
-
-Method resolving and method calling are type-safe actions here:
-
-![type-safety](README-img1.gif)

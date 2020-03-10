@@ -7,6 +7,7 @@ export async function init({locations}: AppContext): Promise<BrowserWindow> {
         icon: locations.browserWindowIcon,
         webPreferences: {
             sandbox: true,
+            contextIsolation: true,
             nodeIntegration: false,
             enableRemoteModule: false,
             preload: locations.browserWindowPreload,

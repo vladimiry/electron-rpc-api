@@ -7,14 +7,19 @@
 </head>
 <body>
 <form class="form-inline">
-    <input class="form-control mb-2 mr-sm-2" type="text" name="domain" placeholder="Domain" value="github.com">
-    <select class="form-control mb-2 mr-sm-2" name="times">
-        <option value="3" selected>3 times</option>
-        <option value="5">5 times</option>
-        <option value="10">10 times</option>
-    </select>
-    <button class="btn btn-primary mb-2 mr-sm-2" type="submit" name="ping">
-        Go
+    <fieldset>
+        <input class="form-control mb-2 mr-sm-2" type="text" name="domain" placeholder="Domain" value="github.com">
+        <select class="form-control mb-2 mr-sm-2" name="times">
+            <option value="3" selected>3 times</option>
+            <option value="5">5 times</option>
+            <option value="10">10 times</option>
+        </select>
+        <button class="btn btn-primary mb-2 mr-sm-2" type="submit">
+            Go
+        </button>
+    </fieldset>
+    <button class="btn btn-danger mb-2 mr-sm-2" type="button">
+        Quit
     </button>
 </form>
 </body>
