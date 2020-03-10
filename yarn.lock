@@ -3739,14 +3739,14 @@ public-encrypt@^4.0.0:
     randombytes "^2.0.1"
     safe-buffer "^5.1.2"
 
-pubsub-to-rpc-api@^5.2.0-beta.3:
-  version "5.2.0-beta.3"
-  resolved "https://registry.yarnpkg.com/pubsub-to-rpc-api/-/pubsub-to-rpc-api-5.2.0-beta.3.tgz#c5f86985ce875cdf3b553cc1a6bae6723b4ef309"
-  integrity sha512-CU2GDqNLcNvW4pabgKxgiGblLyBAU178Egz5EW99SnaqzgqPFm7s5m8LcnNAlPVd8mW1r8qAy/4KfvJO4Pjf/w==
+pubsub-to-rpc-api@^5.2.0-beta.4:
+  version "5.2.0-beta.4"
+  resolved "https://registry.yarnpkg.com/pubsub-to-rpc-api/-/pubsub-to-rpc-api-5.2.0-beta.4.tgz#c6622bb48d8d6b1cc8210ce63e94cb792eb855c2"
+  integrity sha512-Iaf36/gN6+fry52lrcBowBFVe8B7RIafLCGdI6akipM3c0wCXGLBXZIp41nWhhvtZn/yLPQ243Hubm7M2mJhDg==
   dependencies:
     jsan "^3.1.13"
     pure-uuid "^1.6.0"
-    serialize-error "^5.0.0"
+    serialize-error "https://github.com/vladimiry-playground/serialize-error#a2c28c7f7f4ce409780ac7c6918d8ea875934a43"
     tslib "^1.11.0"
 
 pump@^3.0.0:
@@ -4101,10 +4101,9 @@ serialize-error@^2.1.0:
   resolved "https://registry.yarnpkg.com/serialize-error/-/serialize-error-2.1.0.tgz#50b679d5635cdf84667bdc8e59af4e5b81d5f60a"
   integrity sha1-ULZ51WNc34Rme9yOWa9OW4HV9go=
 
-serialize-error@^5.0.0:
+"serialize-error@git+https://github.com/vladimiry-playground/serialize-error.git#a2c28c7f7f4ce409780ac7c6918d8ea875934a43":
   version "5.0.0"
-  resolved "https://registry.yarnpkg.com/serialize-error/-/serialize-error-5.0.0.tgz#a7ebbcdb03a5d71a6ed8461ffe0fc1a1afed62ac"
-  integrity sha512-/VtpuyzYf82mHYTtI4QKtwHa79vAdU5OQpNPAmE/0UDdlGT0ZxHwC+J6gXkw29wwoVI8fMPsfcVHOwXtUQYYQA==
+  resolved "git+https://github.com/vladimiry-playground/serialize-error.git#a2c28c7f7f4ce409780ac7c6918d8ea875934a43"
   dependencies:
     type-fest "^0.8.0"
 
