@@ -97,11 +97,15 @@ Method resolving and method calling are type-safe actions here:
     import {ElectronWindow} from "src/shared/model";
     import {IPC_MAIN_API_SERVICE} from "src/shared/ipc-main-api-definition";
     
-    export const __ELECTRON_EXPOSURE__: ElectronWindow["__ELECTRON_EXPOSURE__"] = {
-        buildIpcMainClient: IPC_MAIN_API_SERVICE.client.bind(IPC_MAIN_API_SERVICE),
+    const electronWindow: ElectronWindow = {
+        __ELECTRON_EXPOSURE__: {
+            buildIpcMainClient: IPC_MAIN_API_SERVICE.client.bind(IPC_MAIN_API_SERVICE),
+        },
     };
     
-    contextBridge.exposeInMainWorld("__ELECTRON_EXPOSURE__", __ELECTRON_EXPOSURE__);    
+    const exposeKey: keyof typeof electronWindow = "__ELECTRON_EXPOSURE__";
+    
+    contextBridge.exposeInMainWorld(exposeKey, electronWindow[exposeKey]);
     ```
 
 - And finally calling the API methods in `renderer` process using exposed in preload script `window.__ELECTRON_EXPOSURE__` property ([example/electron-app/src/renderer/browser-window/index.ts](example/electron-app/src/renderer/browser-window/index.ts)):

@@ -2,7 +2,7 @@ import {subscribableLikeToObservable} from "electron-rpc-api";
 
 import "./index.scss";
 
-// this "cleanup" code is recommended if you created/destroy
+// this "cleanup" code is recommended if you create/destroy
 // the renderer processes dynamically multiple times
 const cleanupPromise = new Promise<void>((resolve) => {
     // WARN: don"t call ".destroy()" on BrowserWindow in main process but ".close()"
@@ -11,7 +11,7 @@ const cleanupPromise = new Promise<void>((resolve) => {
 });
 
 const ipcMainApiClient = __ELECTRON_EXPOSURE__.buildIpcMainClient({
-    // this "cleanup" code is recommended if you created/destroy
+    // this "cleanup" code is recommended if you create/destroy
     // the renderer processes dynamically multiple times
     options: {finishPromise: cleanupPromise},
 });
