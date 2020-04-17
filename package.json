@@ -1,6 +1,6 @@
 {
   "name": "electron-rpc-api",
-  "version": "6.1.0-beta.6",
+  "version": "6.1.0",
   "description": "Wrapper around the Electron's IPC for building type-safe API based RPC-like and reactive interactions",
   "author": "Vladimir Yakovlev <dev.vladimir.y@gmail.com> (https://github.com/vladimiry)",
   "license": "MIT",
