@@ -45,7 +45,7 @@
     "bootstrap": "4.4.1",
     "cross-env": "7.0.2",
     "css-loader": "3.5.2",
-    "electron": "8.2.3",
+    "electron": "8.2.4",
     "electron-builder": "22.5.1",
     "html-webpack-plugin": "4.2.0",
     "husky": "4.2.5",
