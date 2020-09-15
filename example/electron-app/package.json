@@ -73,6 +73,9 @@
     "webpack-node-externals": "2.5.2"
   },
   "resolutions": {
-    "*/**/@types/webpack": "4.41.22"
+    "*/**/@types/webpack": "4.41.22",
+    "import-sort-cli/yargs": "^15.x",
+    "import-sort-parser-typescript/typescript": "^4.x",
+    "webpack-dev-server/selfsigned/node-forge": "^0.10.0"
   }
 }
