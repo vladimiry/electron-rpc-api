@@ -10,8 +10,8 @@ import {merge as webpackMerge} from "webpack-merge";
 import packageJson from "./package.json";
 
 const production = process.env.NODE_ENV !== "development";
-const root = (value: string = "") => path.join(process.cwd(), value);
-const output = (value: string = "") => path.join(root("./app/generated"), value);
+const root = (value = ""): string => path.join(process.cwd(), value);
+const output = (value = ""): string => path.join(root("./app/generated"), value);
 
 const buildConfig = (configPatch: Configuration, tsOptions: Partial<Options> = {}): Configuration => {
     return webpackMerge(

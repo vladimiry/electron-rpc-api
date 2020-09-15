@@ -26,10 +26,8 @@ window.addEventListener("DOMContentLoaded", () => {
     const input = form.querySelector("[name=domain]") as HTMLInputElement;
     const times = form.querySelector("[name=times]") as HTMLInputElement;
     const quitBtn = form.querySelector(`[type="button"]`) as HTMLFormElement;
-    const disableForm = (disable: boolean) => {
-        disable
-            ? fieldset.setAttribute("disabled", "disabled")
-            : fieldset.removeAttribute("disabled")
+    const disableForm = (disable: boolean): void => {
+        fieldset[disable ? "setAttribute" : "removeAttribute"]("disabled", "disabled");
     };
 
     form.addEventListener("submit", async (event) => {
@@ -46,7 +44,7 @@ window.addEventListener("DOMContentLoaded", () => {
             // "error" handler
             async ({message}) => {
                 disableForm(false);
-                await append(`<span class="badge badge-danger">${message}</span>`);
+                await append(`<span class="badge badge-danger">${String(message)}</span>`);
             },
             // "complete" handler
             () => {
@@ -60,7 +58,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-async function append(html: string) {
+async function append(html: string): Promise<void> {
     document.body
         .appendChild(document.createElement("div"))
         .innerHTML = await ipcMainSanitizeHtmlMethod(html);

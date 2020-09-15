@@ -28,7 +28,7 @@ export async function init({locations}: AppContext): Promise<BrowserWindow> {
     return browserWindow;
 }
 
-export function activate(uiContext?: AppUiContext) {
+export function activate(uiContext?: AppUiContext): void {
     if (!uiContext || !uiContext.browserWindow) {
         return;
     }
@@ -37,7 +37,7 @@ export function activate(uiContext?: AppUiContext) {
     uiContext.browserWindow.focus();
 }
 
-export function toggle(uiContext?: AppUiContext, forceVisibilityState?: boolean) {
+export function toggle(uiContext?: AppUiContext, forceVisibilityState?: boolean): void {
     if (!uiContext || !uiContext.browserWindow) {
         return;
     }

@@ -6,7 +6,7 @@ import {toggle as toggleBrowserWindow} from "./window";
 
 export async function init(ctx: AppContext, api: ScannedIpcMainApiService["ApiClient"]): Promise<Tray> {
     const tray = new Tray(ctx.locations.trayIcon);
-    const toggleWindow = () => toggleBrowserWindow(ctx.uiContext);
+    const toggleWindow = (): void => toggleBrowserWindow(ctx.uiContext);
     const contextMenu = Menu.buildFromTemplate([
         {
             label: "Toggle Window",

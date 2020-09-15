@@ -1,8 +1,0 @@
-{
-  "rulesDirectory": [
-    "./node_modules/tslint-microsoft-contrib"
-  ],
-  "rules": {
-    "no-relative-imports": false
-  }
-}

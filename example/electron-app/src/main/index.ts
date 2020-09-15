@@ -11,8 +11,7 @@ import {register as registerApi} from "./ipc-main-api";
 
 const development = process.env.NODE_ENV === "development";
 
-// tslint:disable-next-line:no-floating-promises
-(async () => {
+(async () => { // eslint-disable-line @typescript-eslint/no-floating-promises
     await initApp(
         initContext(),
         registerApi(),
@@ -22,7 +21,7 @@ const development = process.env.NODE_ENV === "development";
 async function initApp(
     ctx: AppContext,
     api: ScannedIpcMainApiService["ApiClient"],
-) {
+): Promise<void> {
     if (development) {
         app.on("web-contents-created", (...[, contents]) => {
             contents.openDevTools();
@@ -45,8 +44,8 @@ async function initApp(
 
 function initContext(): AppContext {
     const appRoot = path.join(__dirname, "./../../../app");
-    const appRelative = (value: string = "") => path.join(appRoot, value);
-    const formatFileUrl = (pathname: string) => url.format({pathname, protocol: "file:", slashes: true});
+    const appRelative = (value = ""): string => path.join(appRoot, value);
+    const formatFileUrl = (pathname: string): string => url.format({pathname, protocol: "file:", slashes: true});
     const browserWindowIcon = "./assets/icons/icon.png";
     const browserWindowPage = development
         ? "http://localhost:8080/renderer/browser-window/index.html"

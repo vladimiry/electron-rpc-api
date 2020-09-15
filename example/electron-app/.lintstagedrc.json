@@ -2,8 +2,5 @@
   "*.ts": [
     "import-sort --write",
     "yarn run lint:ts:base --fix"
-  ],
-  "*.js": [
-    "yarn run lint:js:base --fix"
   ]
 }

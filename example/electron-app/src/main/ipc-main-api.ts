@@ -14,7 +14,7 @@ export function register(): ScannedIpcMainApiService["ApiClient"] {
             return observableToSubscribableLike(
                 interval(/*one second*/ 1000).pipe(
                     take(times),
-                    mergeMap(() => promisify(tcpPing.ping)({address: domain, attempts: times})),
+                    mergeMap(async () => promisify(tcpPing.ping)({address: domain, attempts: times})),
                     map(({avg: value}) => {
                         if (typeof value === "undefined" || isNaN(value)) {
                             throw new Error(`Host "${domain}" is unreachable`);
