@@ -2,10 +2,10 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import nodeExternals from "webpack-node-externals";
 import path from "path";
-import webpackMerge from "webpack-merge";
 import {Configuration} from "webpack";
 import {Options} from "tsconfig-paths-webpack-plugin/lib/options";
 import {TsconfigPathsPlugin} from "tsconfig-paths-webpack-plugin";
+import {merge as webpackMerge} from "webpack-merge";
 
 import packageJson from "./package.json";
 
@@ -115,14 +115,24 @@ const configurations = [
                         test: /\.css$/,
                         use: [
                             MiniCssExtractPlugin.loader,
-                            "css-loader",
+                            {
+                                loader: "css-loader",
+                                options: {
+                                    esModule: false,
+                                },
+                            },
                         ],
                     },
                     {
                         test: /\.scss/,
                         use: [
                             MiniCssExtractPlugin.loader,
-                            "css-loader",
+                            {
+                                loader: "css-loader",
+                                options: {
+                                    esModule: false,
+                                },
+                            },
                             "sass-loader",
                         ],
                     },
