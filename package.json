@@ -1,6 +1,6 @@
 {
   "name": "electron-rpc-api",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "description": "Wrapper around the Electron's IPC for building type-safe API based RPC-like and reactive interactions",
   "author": "Vladimir Yakovlev <dev.vladimir.y@gmail.com> (https://github.com/vladimiry)",
   "license": "MIT",
@@ -43,30 +43,34 @@
   },
   "dependencies": {
     "pubsub-to-rpc-api": "^5.2.0",
-    "pure-uuid": "^1.5.8",
-    "tslib": "^1.11.1"
+    "pure-uuid": "^1.6.1",
+    "tslib": "^2.0.1"
   },
   "devDependencies": {
     "@types/node": "^12.12.21",
-    "@types/sinon": "^9.0.0",
+    "@types/sinon": "^9.0.5",
     "@vladimiry/import-sort-style": "^0.1.1",
-    "ava": "^3.7.0",
+    "ava": "^3.12.1",
     "cross-env": "^7.0.2",
-    "husky": "^4.2.5",
+    "husky": "^4.3.0",
     "import-sort-cli": "^6.0.0",
     "import-sort-parser-typescript": "^6.0.0",
     "install-peers": "^1.0.2",
-    "lint-staged": "^10.1.4",
+    "lint-staged": "^10.3.0",
     "npm-run-all": "^4.1.5",
-    "rewiremock": "^3.13.9",
+    "rewiremock": "^3.14.3",
     "rimraf": "^3.0.2",
-    "sinon": "^9.0.2",
-    "ts-node": "^8.8.2",
+    "sinon": "^9.0.3",
+    "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",
-    "tslint": "^6.1.1",
+    "tslint": "^6.1.3",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-rules-bunch": "^1.0.0",
-    "typescript": "^3.8.3"
+    "typescript": "^4.0.2"
+  },
+  "resolutions": {
+    "import-sort-cli/yargs": "^15.x",
+    "import-sort-parser-typescript/typescript": "^4.x"
   }
 }
