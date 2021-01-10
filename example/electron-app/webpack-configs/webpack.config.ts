@@ -1,5 +1,4 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import nodeExternals from "webpack-node-externals";
 import path from "path";
 import {Configuration} from "webpack";
@@ -7,7 +6,8 @@ import {Options} from "tsconfig-paths-webpack-plugin/lib/options";
 import {TsconfigPathsPlugin} from "tsconfig-paths-webpack-plugin";
 import {merge as webpackMerge} from "webpack-merge";
 
-import packageJson from "./package.json";
+import packageJson from "package.json";
+import {MiniCssExtractPlugin} from "webpack-configs/require-import";
 
 const production = process.env.NODE_ENV !== "development";
 const root = (value = ""): string => path.join(process.cwd(), value);
@@ -39,8 +39,13 @@ const buildConfig = (configPatch: Configuration, tsOptions: Partial<Options> = {
             resolve: {
                 extensions: ["*", ".js", ".ts"],
                 plugins: [
+                    // @ts-expect-error // eslint-disable-line @typescript-eslint/ban-ts-comment
                     new TsconfigPathsPlugin(tsOptions),
                 ],
+                fallback: {
+                    "path": false,
+                    "fs": false,
+                },
             },
             node: {
                 __dirname: false,
@@ -48,8 +53,8 @@ const buildConfig = (configPatch: Configuration, tsOptions: Partial<Options> = {
             },
             optimization: {
                 minimize: false,
-                namedChunks: true,
-                namedModules: true,
+                chunkIds: "named",
+                moduleIds: "named",
             },
         },
     );
@@ -99,16 +104,6 @@ const configurations = [
                 },
             }),
             target: "web",
-            node: {
-                path: "empty",
-                fs: "empty",
-                __dirname: false,
-                __filename: false,
-                Buffer: false,
-                global: false,
-                process: false,
-                setImmediate: false,
-            },
             module: {
                 rules: [
                     {
