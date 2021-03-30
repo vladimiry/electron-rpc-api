@@ -39,7 +39,6 @@ const buildConfig = (configPatch: Configuration, tsOptions: Partial<Options> = {
             resolve: {
                 extensions: ["*", ".js", ".ts"],
                 plugins: [
-                    // @ts-expect-error // eslint-disable-line @typescript-eslint/ban-ts-comment
                     new TsconfigPathsPlugin(tsOptions),
                 ],
                 fallback: {
