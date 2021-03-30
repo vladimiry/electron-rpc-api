@@ -18,7 +18,7 @@ before_install:
 install:
   - yarn install --pure-lockfile --network-timeout 1000000
   - yarn add rxjs@6
-  - yarn add electron@6
+  - yarn add electron@12
 script:
   - npx envinfo
   - node --version
