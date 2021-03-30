@@ -24,7 +24,7 @@
     "webpack:shortcut": "cross-env TS_NODE_FILES=true npm exec --package=webpack-cli --node-options=\"--require tsconfig-paths/register\" -- webpack"
   },
   "dependencies": {
-    "electron-rpc-api": "6.1.1",
+    "electron-rpc-api": "7.0.0-beta1",
     "rxjs": "6.6.7",
     "sanitize-html": "2.3.3",
     "tcp-ping": "0.1.1"

@@ -2387,12 +2387,12 @@ electron-publish@22.10.5:
     lazy-val "^1.0.4"
     mime "^2.5.0"
 
-electron-rpc-api@6.1.1:
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/electron-rpc-api/-/electron-rpc-api-6.1.1.tgz#0ce3ebf9c3cda38ca3059da5773232ec71d3a601"
-  integrity sha512-qXZvgbP9C4UX0QD026fo6+6myeVOPBhhEIBwigGJ9bRtjgZ3XzfGCr18xTkKAH2kXIqiel/Fk7U/erctMvQ8BA==
+electron-rpc-api@7.0.0-beta1:
+  version "7.0.0-beta1"
+  resolved "https://registry.yarnpkg.com/electron-rpc-api/-/electron-rpc-api-7.0.0-beta1.tgz#d27eb5bb3b39bd0a18792a0a86eeb3a29deaaf9d"
+  integrity sha512-DM5kxkrSb8/JPAdmYqbMGRQN2S5OjwdQpPsgdwVBqiPiRq6vZHZL4M9S/bXqmpx8KSFR9RU9bZQLbrPZ6/xkPw==
   dependencies:
-    pubsub-to-rpc-api "^5.2.1"
+    pubsub-to-rpc-api "^6.0.0-beta1"
     pure-uuid "^1.6.2"
     tslib "^2.1.0"
 
@@ -5579,10 +5579,10 @@ prr@~1.0.1:
   resolved "https://registry.yarnpkg.com/prr/-/prr-1.0.1.tgz#d3fc114ba06995a45ec6893f484ceb1d78f5f476"
   integrity sha1-0/wRS6BplaRexok/SEzrHXj19HY=
 
-pubsub-to-rpc-api@^5.2.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/pubsub-to-rpc-api/-/pubsub-to-rpc-api-5.2.1.tgz#2ce62ce28cedd9a5bcd58e52cf7288f138b0b058"
-  integrity sha512-UGMaeU3fyiXcc2yOW5RdnpNj64ezCzwps7WY2QE2BfnJDZvgK1DeO9Bv9RE10SZ3EgH4XhNI3o2RrDwRXKwXmg==
+pubsub-to-rpc-api@^6.0.0-beta1:
+  version "6.0.0-beta1"
+  resolved "https://registry.yarnpkg.com/pubsub-to-rpc-api/-/pubsub-to-rpc-api-6.0.0-beta1.tgz#b890b6218a0fc76f5889170c32385a3a8d7c94e6"
+  integrity sha512-aorV4LRfjm0CxrB9Ie3w6G3J9siTTHJvd8KE3sEjn/mhCD29ejVV9p4ppVay9rc2dgOGkvI98GVdcXAkcGNfQA==
   dependencies:
     jsan "^3.1.13"
     pure-uuid "^1.6.2"
