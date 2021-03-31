@@ -1,6 +1,6 @@
 # electron-rpc-api
 
-[![Build Status](https://travis-ci.org/vladimiry/electron-rpc-api.svg?branch=master)](https://travis-ci.org/vladimiry/electron-rpc-api)
+[![GitHub Actions CI](https://github.com/vladimiry/electron-rpc-api/workflows/GitHub%20Actions%20CI/badge.svg?branch=master)](https://github.com/vladimiry/electron-rpc-api/actions)
 
 Is a wrapper around the Electron's IPC for building type-safe API based RPC-like and reactive interactions.
 
