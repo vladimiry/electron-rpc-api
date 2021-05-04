@@ -15,6 +15,5 @@ jobs:
           yarn --version
           npx envinfo
           yarn --pure-lockfile --network-timeout 60000
-          yarn add rxjs@6
           yarn add electron@12
           yarn run lib
