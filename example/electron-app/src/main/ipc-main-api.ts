@@ -30,7 +30,7 @@ export function register(): ScannedIpcMainApiService["ApiClient"] {
                 {
                     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["span"]),
                     allowedClasses: {
-                        span: ["badge", "badge-light", "badge-danger"],
+                        span: ["badge", "bg-secondary", "bg-danger"],
                     },
                 },
             );

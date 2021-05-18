@@ -39,12 +39,12 @@ window.addEventListener("DOMContentLoaded", () => {
             ipcMainPingMethod({domain: input.value, times: Number(times.value)})
         ).subscribe(
             async ({domain, value}) => {
-                await append(`<span class="badge badge-light">${domain}</span> <small>${value}</small>`);
+                await append(`<span class="badge bg-secondary">${domain}</span> <small>${value}</small>`);
             },
             // "error" handler
             async ({message}) => {
                 disableForm(false);
-                await append(`<span class="badge badge-danger">${String(message)}</span>`);
+                await append(`<span class="badge bg-danger">${String(message)}</span>`);
             },
             // "complete" handler
             () => {
