@@ -45,10 +45,10 @@
     "electron": ">=5.0.0"
   },
   "dependencies": {
-    "pubsub-to-rpc-api": "^7.0.0",
+    "pubsub-to-rpc-api": "^7.1.0",
     "pure-uuid": "^1.6.2",
-    "rxjs": "^7.0.0",
-    "tslib": "^2.1.0"
+    "rxjs": "^7.3.0",
+    "tslib": "^2.3.1"
   },
   "devDependencies": {
     "@types/node": "^14.14.37",
@@ -56,22 +56,22 @@
     "@vladimiry/import-sort-style": "^0.1.4",
     "ava": "^3.15.0",
     "cross-env": "^7.0.3",
-    "husky": "^6.0.0",
+    "husky": "^7.0.2",
     "import-sort-cli": "^6.0.0",
     "import-sort-parser-typescript": "^6.0.0",
     "install-peers": "^1.0.2",
-    "lint-staged": "^11.0.0",
+    "lint-staged": "^11.1.2",
     "npm-run-all2": "^5.0.2",
     "rewiremock": "^3.14.3",
     "rimraf": "^3.0.2",
-    "sinon": "^11.1.1",
-    "ts-node": "^10.0.0",
-    "tsconfig-paths": "^3.9.0",
+    "sinon": "^11.1.2",
+    "ts-node": "^10.2.1",
+    "tsconfig-paths": "^3.11.0",
     "tslint": "^6.1.3",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-rules-bunch": "^1.0.0",
-    "typescript": "^4.3.2"
+    "typescript": "^4.4.2"
   },
   "resolutions": {
     "*/**/tslib": "^2.x",
