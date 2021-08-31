@@ -1,6 +1,6 @@
 import * as Lib from "pubsub-to-rpc-api";
 import UUID from "pure-uuid";
-import {IpcMessageEvent, IpcRenderer, WebviewTag} from "electron";
+import {IpcMessageEvent, IpcRenderer} from "electron";
 
 import * as PM from "./private/model";
 import {curryOwnFunctionMembers} from "./private/util";
@@ -12,7 +12,7 @@ type ACA2 = [IpcMessageEvent, ...PM.Any[]]; // used by "pubsub-to-rpc-api" like 
 type RegisterApiIpcRenderer = Pick<IpcRenderer, "on" | "removeListener" | "sendToHost">;
 
 const ipcRendererEventEmittersCache = new WeakMap<RegisterApiIpcRenderer, Lib.Model.CombinedEventEmitter>();
-const webViewTagEventEmittersCache = new WeakMap<WebviewTag, Lib.Model.CombinedEventEmitter>();
+const webViewTagEventEmittersCache = new WeakMap<Electron.WebviewTag, Lib.Model.CombinedEventEmitter>();
 
 const clientIpcMessageEventName = "ipc-message";
 const clientIpcMessageListenerBundleProp = Symbol(`[${PM.MODULE_NAME}] clientIpcMessageListenerBundleProp symbol`);
@@ -25,7 +25,7 @@ export function createWebViewApiService<AD extends Lib.Model.ApiDefinition<AD>>(
         options?: Lib.Model.CreateServiceRegisterOptions<AD, ACA2> & { ipcRenderer?: RegisterApiIpcRenderer; },
     ) => ReturnType<Lib.Model.CreateServiceReturn<AD, ACA2>["register"]>;
     client: (
-        webView: WebviewTag,
+        webView: Electron.WebviewTag,
         params?: { options?: Partial<Lib.Model.CallOptions<AD, ACA2>> },
     ) => ReturnType<Lib.Model.CreateServiceReturn<AD, ACA2>["caller"]>;
 } {
