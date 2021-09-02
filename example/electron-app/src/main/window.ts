@@ -9,7 +9,6 @@ export async function init({locations}: AppContext): Promise<BrowserWindow> {
             sandbox: true,
             contextIsolation: true,
             nodeIntegration: false,
-            enableRemoteModule: false,
             preload: locations.browserWindowPreload,
         },
     });

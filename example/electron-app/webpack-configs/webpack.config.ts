@@ -10,8 +10,8 @@ import packageJson from "package.json";
 import {MiniCssExtractPlugin} from "webpack-configs/require-import";
 
 const production = process.env.NODE_ENV !== "development";
-const root = (value = ""): string => path.join(process.cwd(), value);
-const output = (value = ""): string => path.join(root("./app/generated"), value);
+const rootPath = (value = ""): string => path.join(process.cwd(), value);
+const outputPath = (value = ""): string => path.join(rootPath("./app/generated"), value);
 
 const buildConfig = (configPatch: Configuration, tsOptions: Partial<Options> = {}): Configuration => {
     return webpackMerge(
@@ -21,7 +21,7 @@ const buildConfig = (configPatch: Configuration, tsOptions: Partial<Options> = {
             devtool: false,
             output: {
                 filename: "[name].js",
-                path: output(),
+                path: outputPath(),
             },
             module: {
                 rules: [
@@ -38,6 +38,9 @@ const buildConfig = (configPatch: Configuration, tsOptions: Partial<Options> = {
             },
             resolve: {
                 extensions: ["*", ".js", ".ts"],
+                alias: {
+                    "msgpackr": rootPath("./node_modules/msgpackr/index.js"),
+                },
                 plugins: [
                     new TsconfigPathsPlugin(tsOptions),
                 ],
@@ -64,7 +67,7 @@ const configurations = [
         {
             target: "electron-main",
             entry: {
-                "main/index": root("./src/main/index.ts"),
+                "main/index": rootPath("./src/main/index.ts"),
             },
             externals: [
                 nodeExternals({
@@ -76,30 +79,34 @@ const configurations = [
             ],
         },
         {
-            configFile: root("./src/main/tsconfig.json"),
+            configFile: rootPath("./src/main/tsconfig.json"),
         },
     ),
     buildConfig(
         {
             entry: {
-                "renderer/browser-window-preload/index": root("./src/renderer/browser-window-preload/index.ts"),
+                "renderer/browser-window-preload/index": rootPath("./src/renderer/browser-window-preload/index.ts"),
             },
             target: "electron-renderer",
         },
         {
-            configFile: root("./src/renderer/browser-window-preload/tsconfig.json"),
+            configFile: rootPath("./src/renderer/browser-window-preload/tsconfig.json"),
         },
     ),
     buildConfig(
         {
             entry: {
-                "renderer/browser-window/index": root("./src/renderer/browser-window/index.ts"),
+                "renderer/browser-window/index": rootPath("./src/renderer/browser-window/index.ts"),
             },
             ...(production ? {} : {
                 devServer: {
-                    inline: true,
-                    stats: "minimal",
-                    clientLogLevel: "error",
+                    client: {
+                        logging: "error",
+                        progress: true,
+					},
+                    devMiddleware: {
+                        stats: "minimal",
+					},
                 },
             }),
             target: "web",
@@ -135,8 +142,8 @@ const configurations = [
             plugins: [
                 new MiniCssExtractPlugin(),
                 new HtmlWebpackPlugin({
-                    template: root("./src/renderer/browser-window/index.html"),
-                    filename: output("./renderer/browser-window/index.html"),
+                    template: rootPath("./src/renderer/browser-window/index.html"),
+                    filename: outputPath("./renderer/browser-window/index.html"),
                     title: packageJson.description,
                     minify: false,
                     hash: false,
@@ -144,7 +151,7 @@ const configurations = [
             ],
         },
         {
-            configFile: root("./src/renderer/browser-window/tsconfig.json"),
+            configFile: rootPath("./src/renderer/browser-window/tsconfig.json"),
         },
     ),
 ];
