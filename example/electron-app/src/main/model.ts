@@ -3,16 +3,16 @@ export interface AppContext {
     uiContext?: AppUiContext;
 }
 
-export type AppContextLocations = Readonly<{
+export interface AppContextLocations {
     readonly app: string;
     readonly browserWindowIcon: string;
     readonly browserWindowPage: string;
     readonly browserWindowPreload: string;
     readonly trayIcon: string;
-    readonly renderer: Readonly<{
+    readonly renderer: {
         readonly browserWindow: string;
-    }>;
-}>;
+    };
+}
 
 export interface AppUiContext {
     browserWindow: Electron.BrowserWindow;
