@@ -1,6 +1,6 @@
 {
   "*.ts": [
-    "import-sort --write",
-    "yarn run lint:ts:base --fix"
+    "format-imports",
+    "yarn lint"
   ]
 }

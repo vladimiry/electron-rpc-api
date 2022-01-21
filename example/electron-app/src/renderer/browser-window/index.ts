@@ -1,6 +1,6 @@
-import {subscribableLikeToObservable} from "electron-rpc-api";
-
 import "./index.scss";
+
+import {subscribableLikeToObservable} from "electron-rpc-api";
 
 // the below code block is recommended for adding if you create/destroy
 // the renderer processes dynamically (multiple times)

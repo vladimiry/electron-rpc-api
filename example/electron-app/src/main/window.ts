@@ -1,4 +1,4 @@
-import {BrowserWindow, app} from "electron";
+import {app, BrowserWindow} from "electron";
 
 import {AppContext, AppUiContext} from "./model";
 

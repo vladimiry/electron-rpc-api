@@ -1,13 +1,13 @@
+import {app} from "electron";
 import os from "os";
 import path from "path";
 import url from "url";
-import {app} from "electron";
 
 import {AppContext} from "./model";
-import {ScannedIpcMainApiService} from "src/shared/ipc-main-api-definition";
 import {init as initBrowserWindow} from "./window";
 import {init as initTray} from "./tray";
 import {register as registerApi} from "./ipc-main-api";
+import {ScannedIpcMainApiService} from "src/shared/ipc-main-api-definition";
 
 const development = process.env.NODE_ENV === "development";
 

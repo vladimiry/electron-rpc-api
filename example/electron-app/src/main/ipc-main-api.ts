@@ -1,10 +1,10 @@
-import sanitizeHtml from "sanitize-html";
-import tcpPing from "tcp-ping";
 import {app} from "electron";
 import {interval} from "rxjs";
 import {map, mergeMap, take} from "rxjs/operators";
 import {observableToSubscribableLike} from "electron-rpc-api";
 import {promisify} from "util";
+import sanitizeHtml from "sanitize-html";
+import tcpPing from "tcp-ping";
 
 import {IPC_MAIN_API_SERVICE, ScannedIpcMainApiService} from "src/shared/ipc-main-api-definition";
 
