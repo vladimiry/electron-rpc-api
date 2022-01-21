@@ -1,11 +1,11 @@
 import * as sinon from "sinon";
-import anyTest, {TestInterface} from "ava";
+import anyTest, {TestFn} from "ava";
 
 import * as PM from "lib/private/model";
 import {ActionType, ScanService} from "lib";
 import {rewiremock} from "./rewiremock";
 
-const test = anyTest as TestInterface<TestContext>;
+const test = anyTest as TestFn<TestContext>;
 
 const apiDefinition = {
     stringToNumber: ActionType.Promise<[string], number>(),
