@@ -1,9 +1,9 @@
+import {IpcMessageEvent, IpcRenderer} from "electron";
 import * as Lib from "pubsub-to-rpc-api";
 import UUID from "pure-uuid";
-import {IpcMessageEvent, IpcRenderer} from "electron";
 
-import * as PM from "./private/model";
 import {curryOwnFunctionMembers} from "./private/util";
+import * as PM from "./private/model";
 import {requireIpcRenderer} from "./private/electron-require";
 
 // TODO infer as PM.Arguments<(PM.Arguments<Electron.WebviewTag["on"]>)[1]> (listener is currently defined by Electron as a raw function)

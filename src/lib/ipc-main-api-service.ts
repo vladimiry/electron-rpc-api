@@ -1,8 +1,8 @@
-import * as Lib from "pubsub-to-rpc-api";
 import {IpcMain, IpcMainEvent, IpcRenderer} from "electron";
+import * as Lib from "pubsub-to-rpc-api";
 
-import * as PM from "./private/model";
 import {curryOwnFunctionMembers} from "./private/util";
+import * as PM from "./private/model";
 import {requireIpcMain, requireIpcRenderer} from "./private/electron-require";
 
 // TODO infer from Electron.IpcMain["on"] listener arguments

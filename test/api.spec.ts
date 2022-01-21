@@ -1,8 +1,8 @@
-import * as sinon from "sinon";
 import anyTest, {TestFn} from "ava";
+import * as sinon from "sinon";
 
-import * as PM from "lib/private/model";
 import {ActionType, ScanService} from "lib";
+import * as PM from "lib/private/model";
 import {rewiremock} from "./rewiremock";
 
 const test = anyTest as TestFn<TestContext>;

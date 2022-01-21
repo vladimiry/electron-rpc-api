@@ -1,4 +1,4 @@
-import * as PM from "./../private/model";
+import * as PM from "../private/model";
 
 export function curryOwnFunctionMembers<T extends object | ((...a: PM.Any) => PM.Any)>(
     src: T,

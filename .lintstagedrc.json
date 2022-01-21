@@ -1,6 +1,6 @@
 {
   "*.ts": [
-    "npx import-sort --write",
+    "npx format-imports",
     "npx tslint -p ./tsconfig.json --fix"
   ]
 }
