@@ -119,7 +119,7 @@ Method resolving and method calling are type-safe actions here:
     const cleanupPromise = new Promise<void>((resolve) => {
         // don't call ".destroy()" on the BrowserWindow instance in the main process but ".close()"
         // since the app needs "window.beforeunload" event handler to be triggered
-        window.addEventListener("beforeunload", () => resolve);
+        window.addEventListener("beforeunload", () => resolve());
     });
     
     const ipcMainApiClient = __ELECTRON_EXPOSURE__.buildIpcMainClient({
