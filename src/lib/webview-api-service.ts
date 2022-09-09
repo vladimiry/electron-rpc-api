@@ -47,7 +47,7 @@ export function createWebViewApiService<AD extends Lib.Model.ApiDefinition<AD>>(
                 ipcRendererEventEmittersCache.get(ipcRenderer)
                 ||
                 (() => {
-                    const em: typeof cachedEm = {
+                    const em: Lib.Model.CombinedEventEmitter = {
                         on: ipcRenderer.on.bind(ipcRenderer),
                         removeListener: ipcRenderer.removeListener.bind(ipcRenderer),
                         emit: ipcRenderer.sendToHost.bind(ipcRenderer),
@@ -103,7 +103,7 @@ export function createWebViewApiService<AD extends Lib.Model.ApiDefinition<AD>>(
                         [clientIpcMessageListenerBundleProp]?: IpcMessageListenerBundleProp;
                     }
 
-                    const em: typeof cachedEm = {
+                    const em: Lib.Model.CombinedEventEmitter = {
                         on: (originalEventName, originalListener) => {
                             const ipcMessageListenerBundle: IpcMessageListenerBundleProp = {
                                 uid: new UUID(4).format(),

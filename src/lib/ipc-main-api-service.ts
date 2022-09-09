@@ -43,7 +43,7 @@ export function createIpcMainApiService<AD extends Lib.Model.ApiDefinition<AD>, 
                 ipcMainEventEmittersCache.get(ipcMain)
                 ||
                 (() => {
-                    const em: typeof cachedEm = {
+                    const em: Lib.Model.CombinedEventEmitter = {
                         on: ipcMain.on.bind(ipcMain),
                         removeListener: ipcMain.removeListener.bind(ipcMain),
                         emit: ipcMain.emit.bind(ipcMain),
@@ -97,7 +97,7 @@ export function createIpcMainApiService<AD extends Lib.Model.ApiDefinition<AD>, 
                 ipcRendererEventEmittersCache.get(ipcRenderer)
                 ||
                 (() => {
-                    const em: typeof cachedEm = {
+                    const em: Lib.Model.CombinedEventEmitter = {
                         on: ipcRenderer.on.bind(ipcRenderer),
                         removeListener: ipcRenderer.removeListener.bind(ipcRenderer),
                         emit: ipcRenderer.send.bind(ipcRenderer),
