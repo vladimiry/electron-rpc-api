@@ -24,7 +24,7 @@
   "dependencies": {
     "electron-rpc-api": "10.0.0",
     "rxjs": "7.8.1",
-    "sanitize-html": "2.11.0",
+    "sanitize-html": "2.12.1",
     "tcp-ping": "0.1.1"
   },
   "devDependencies": {
