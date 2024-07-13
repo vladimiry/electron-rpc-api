@@ -1,12 +1,11 @@
-import HtmlWebpackPlugin from "html-webpack-plugin";
-import nodeExternals from "webpack-node-externals";
-import path from "path";
 import {Configuration} from "webpack";
+import HtmlWebpackPlugin from "html-webpack-plugin";
 import {Options} from "tsconfig-paths-webpack-plugin/lib/options";
+import packageJson from "package.json";
+import path from "path";
 import {TsconfigPathsPlugin} from "tsconfig-paths-webpack-plugin";
 import {merge as webpackMerge} from "webpack-merge";
 
-import packageJson from "package.json";
 import {MiniCssExtractPlugin} from "webpack-configs/require-import";
 
 const production = process.env.NODE_ENV !== "development";
@@ -69,14 +68,7 @@ const configurations = [
             entry: {
                 "main/index": rootPath("./src/main/index.ts"),
             },
-            externals: [
-                nodeExternals({
-                    modulesFromFile: {
-                        exclude: ["devDependencies"],
-                        include: ["dependencies"],
-                    },
-                }),
-            ],
+            externals: Object.keys(packageJson.dependencies).map((value) => `commonjs ${value}`),
         },
         {
             configFile: rootPath("./src/main/tsconfig.json"),
