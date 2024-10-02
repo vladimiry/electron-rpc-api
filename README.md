@@ -4,7 +4,7 @@
 
 Is a wrapper around the Electron's IPC for building type-safe API based RPC-like and reactive interactions.
 
-You describe an API structure and communication channel only once creating an API Service instance and then you share that instance between provider and client. It means that API method names and types of the input/return parameters on the client side are the same as on the provider side, so you get a type-safety on both sides having no overhead in runtime, thanks to TypeScript.
+You describe an API structure and communication channel only once creating an API Service definition and then you share that definition between provider and client. It means that API method names and types of the input/return parameters on the client side are the same as on the provider side, so you get a type-safety on both sides having no overhead in runtime, thanks to TypeScript.
 
 The module provides `createIpcMainApiService` and `createWebViewApiService` factory-like functions that can be used to create respective service instances.
 
